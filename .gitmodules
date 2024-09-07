@@ -1,0 +1,9 @@
+[submodule "lib/valijson"]
+	path = lib/valijson
+	url = https://github.com/tristanpenman/valijson
+[submodule "lib/rapidjson"]
+	path = lib/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "lib/JSONParser"]
+	path = lib/JSONParser
+	url = https://github.com/JasonLukacs/JSONParser.git
