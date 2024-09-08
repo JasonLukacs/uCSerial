@@ -41,20 +41,18 @@ bool SerialReader::StopReadingPort() {
 
 template <typename Callback>
 bool SerialReader::ReadPort(Callback callback)  {
-    //int pipefd[2];
-    if (pipe(pipefd) == -1) {
-    //std::cerr << "Error creating pipe" << std::endl;
-    return 1;
+    if (pipe(pipefd.data()) == -1) {
+    return false;  // implement exception
     }
 
     while (port_monitor_run) {
-        pollfd fds[2];
+        std::array<pollfd, 2> fds;
         fds[0].fd = serial_file_handle;
         fds[0].events = POLLIN;
         fds[1].fd = pipefd[0];
         fds[1].events = POLLIN;
 
-        int ret = poll(fds, 2, 60000);  // Timeout in milliseconds
+        int ret = poll(fds.data(), 2, 60000);  // Timeout in milliseconds
         if (ret > 0) {
             if (fds[0].revents & POLLIN) {
                 // Data is available, call callback
@@ -92,8 +90,6 @@ int SerialReader::ReadToBuffer(std::vector<char> &buffer) const {
 }
 
 bool SerialReader::OpenSerialPort() {
-    //! see Boost.Asio for portable solution.
-
     // Get SerialConfig object
     SerialConfiguration serialConfig = LoadSerialConfiguration();
 

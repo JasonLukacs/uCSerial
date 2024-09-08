@@ -2,6 +2,8 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <array>
+
 
 #include <iostream>
 
@@ -18,11 +20,11 @@ bool uCSerialUtils::WaitForKeypress() {
     tcsetattr(STDIN_FILENO, TCSANOW, &new_termios);
 
     while (true) {
-        pollfd fds[1];
+        std::array<pollfd, 1> fds;
         fds[0].fd = STDIN_FILENO;
         fds[0].events = POLLIN;
 
-        int ret = poll(fds, 1, -1);
+        int ret = poll(fds.data(), 1, -1);
         if (ret > 0) {
             if (fds[0].revents & POLLIN) {
                 // Flush to avoid spill over of keyboard input 

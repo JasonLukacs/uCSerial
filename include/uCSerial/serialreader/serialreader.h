@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <functional>
+#include <array>
 
 #include "exceptions.h"
 
@@ -40,7 +41,7 @@ class SerialReader {
     std::atomic<bool> port_monitor_run{ true };
     int serial_file_handle = -1;
     std::unique_ptr<std::thread> portreadingThread;
-    int pipefd[2];  // Pipe for triggering poll()
+    std::array<int, 2> pipefd;
 
 
     SerialConfiguration LoadSerialConfiguration() const;
