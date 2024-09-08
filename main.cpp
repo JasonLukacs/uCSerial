@@ -27,5 +27,6 @@ int main() {
 
     // Terminate.
     messageParser.Stop();
-    return 1;
+
+    return 0;
 }

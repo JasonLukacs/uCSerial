@@ -1,6 +1,9 @@
-#include <iostream>
+#include <poll.h>
 #include <termios.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
+
+#include <iostream>
 
 #include "uCSerial/utils/utils.h"
 
@@ -14,19 +17,27 @@ bool uCSerialUtils::WaitForKeypress() {
     new_termios.c_lflag &= ~ECHO;  // Disable echo
     tcsetattr(STDIN_FILENO, TCSANOW, &new_termios);
 
-    fd_set readfds;
-    FD_ZERO(&readfds);
-    FD_SET(STDIN_FILENO, &readfds);
-
-    int ret;
-    std::string buffer;
-
     while (true) {
-        ret = select(STDIN_FILENO + 1, &readfds, nullptr, nullptr, nullptr);
+        pollfd fds[1];
+        fds[0].fd = STDIN_FILENO;
+        fds[0].events = POLLIN;
+
+        int ret = poll(fds, 1, -1);
         if (ret > 0) {
-            // Flush to avoid spill over of keyboard input to terminal after termination.
-            read(STDIN_FILENO, &buffer, 1);
-            break;
+            if (fds[0].revents & POLLIN) {
+                // Flush to avoid spill over of keyboard input 
+                // to terminal after termination.
+                int bytes_available;
+                std::string buffer;
+                ioctl(STDIN_FILENO, FIONREAD, &bytes_available);
+                read(STDIN_FILENO, &buffer, bytes_available);
+                break;
+            }
+        } else if (ret == 0) {
+            // Timeout (not applicable in this case)
+        } else {
+            // Error
+            // Handle error as needed
         }
     }
 

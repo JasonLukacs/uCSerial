@@ -40,13 +40,15 @@ class SerialReader {
     std::atomic<bool> port_monitor_run{ true };
     int serial_file_handle = -1;
     std::unique_ptr<std::thread> portreadingThread;
+    int pipefd[2];  // Pipe for triggering poll()
+
 
     SerialConfiguration LoadSerialConfiguration() const;
     bool OpenSerialPort();
     bool CloseSerialPort() const;
 
     template<typename Callback>
-    bool ReadPort(Callback callback) const;
+    bool ReadPort(Callback callback) ;
 };
 
 #endif

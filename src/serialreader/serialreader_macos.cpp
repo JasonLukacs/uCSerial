@@ -1,70 +1,79 @@
-#include <termios.h>
 #include <fcntl.h>
-#include <unistd.h>
+#include <jsonparser.h>
+#include <poll.h>
 #include <sys/ioctl.h>
+#include <termios.h>
+#include <unistd.h>
+
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <thread>
 
-#include <jsonparser.h>
-
 #include "uCSerial/serialreader/serialreader.h"
 
-
-bool SerialReader::SetBufferSize(int buffer_size){
+bool SerialReader::SetBufferSize(int buffer_size) {
     serial_buffer_size = buffer_size <= MAX_BUFFER ? buffer_size : MAX_BUFFER;
     return true;
 }
 
-
-int SerialReader::GetBufferSize() const{
-    return serial_buffer_size;
-}
-
+int SerialReader::GetBufferSize() const { return serial_buffer_size; }
 
 bool SerialReader::StartReadingPort(const std::function<void()> &callback) {
     OpenSerialPort();
 
-    auto threadPtr = std::make_unique<std::thread>([this, callback]() {
-        ReadPort(callback);
-    });
+    auto threadPtr = std::make_unique<std::thread>(
+        [this, callback]() { ReadPort(callback); });
     portreadingThread = std::move(threadPtr);
 
     return true;
 }
 
-
 bool SerialReader::StopReadingPort() {
     if (portreadingThread) {
         port_monitor_run = false;
+        // Write to the pipe to trigger poll()
+        write(pipefd[1], "y", 1);  // Write any data to trigger poll()
         portreadingThread->join();
     }
     return true;
 }
 
-
-template<typename Callback>
-bool SerialReader::ReadPort(Callback callback) const {
-    // Set up select parameters
-    fd_set readfds;
-    FD_ZERO(&readfds);
-    FD_SET(serial_file_handle, &readfds);
-    struct timeval tv;
-    tv.tv_sec = 60;  // Timeout in seconds
-    tv.tv_usec = 0;  // Timeout in microseconds
+template <typename Callback>
+bool SerialReader::ReadPort(Callback callback)  {
+    //int pipefd[2];
+    if (pipe(pipefd) == -1) {
+    //std::cerr << "Error creating pipe" << std::endl;
+    return 1;
+    }
 
     while (port_monitor_run) {
-        // Wait for data or timeout
-        int ret = select(serial_file_handle + 1, &readfds, nullptr, nullptr, &tv);
-        if (ret > 0) {  // ==0:timeout, ==-1:error
-            // Data is available, call callback
-            callback();
+        pollfd fds[2];
+        fds[0].fd = serial_file_handle;
+        fds[0].events = POLLIN;
+        fds[1].fd = pipefd[0];
+        fds[1].events = POLLIN;
+
+        int ret = poll(fds, 2, 60000);  // Timeout in milliseconds
+        if (ret > 0) {
+            if (fds[0].revents & POLLIN) {
+                // Data is available, call callback
+                callback();
+            } else if (fds[1].revents & POLLIN) {
+                // Quit
+                break;
+            }
+        } else if (ret == 0) {
+            // Timeout
+            // Handle timeout as needed
+        } else {
+            // Error
+            // Handle error as needed
         }
     }
+
     return true;
 }
-
 
 int SerialReader::GetBytesAvailable() const {
     int bytesAvailable;
@@ -72,9 +81,9 @@ int SerialReader::GetBytesAvailable() const {
     return bytesAvailable;
 }
 
-
 int SerialReader::ReadToBuffer(std::vector<char> &buffer) const {
-    ssize_t bytes_read = read(serial_file_handle, buffer.data(), serial_buffer_size);
+    ssize_t bytes_read =
+        read(serial_file_handle, buffer.data(), serial_buffer_size);
 
     if (bytes_read == -1) {
         // handle error
@@ -82,14 +91,14 @@ int SerialReader::ReadToBuffer(std::vector<char> &buffer) const {
     return int(bytes_read);
 }
 
-
 bool SerialReader::OpenSerialPort() {
     //! see Boost.Asio for portable solution.
 
     // Get SerialConfig object
     SerialConfiguration serialConfig = LoadSerialConfiguration();
 
-    serial_file_handle = open(serialConfig.serial_port.c_str(), O_RDWR | O_NOCTTY);
+    serial_file_handle =
+        open(serialConfig.serial_port.c_str(), O_RDWR | O_NOCTTY);
     if (serial_file_handle == -1) {
         std::string error_message = "Failed to open serial port ";
         error_message += serialConfig.serial_port.c_str();
@@ -107,7 +116,9 @@ bool SerialReader::OpenSerialPort() {
     cfsetospeed(&options, serialConfig.baud_rate);
 
     options.c_cflag &= ~CSIZE;
-    options.c_cflag |= (serialConfig.data_bits - 5) * 256;  // 5, 6, 7, 8 bits: CS5, CS6, CS7, CS8:  0, 256, 512, 768
+    options.c_cflag |=
+        (serialConfig.data_bits - 5) *
+        256;  // 5, 6, 7, 8 bits: CS5, CS6, CS7, CS8:  0, 256, 512, 768
 
     if (serialConfig.parity) {
         options.c_cflag |= PARENB;  //  Parity.
@@ -121,11 +132,14 @@ bool SerialReader::OpenSerialPort() {
         options.c_cflag &= ~CSTOPB;  // 1 stop bit.
     }
 
-    options.c_cflag |= CREAD | CLOCAL;  // Enable receiver, ignore modem status lines.
+    options.c_cflag |=
+        CREAD | CLOCAL;  // Enable receiver, ignore modem status lines.
 
     // Set configuration.
     if (tcsetattr(serial_file_handle, TCSANOW, &options) == -1) {
-        std::string error_message = "Failed to configure serial port, check configuration file. Serial port:  ";
+        std::string error_message =
+            "Failed to configure serial port, check configuration file. Serial "
+            "port:  ";
         error_message += serialConfig.serial_port.c_str();
         throw SerialReaderConfigSerialPortException(error_message);
     }
@@ -133,15 +147,14 @@ bool SerialReader::OpenSerialPort() {
     return true;
 }
 
-
 bool SerialReader::CloseSerialPort() const {
     close(serial_file_handle);
     return true;
 }
 
-
 SerialConfiguration SerialReader::LoadSerialConfiguration() const {
-    std::string serial_config_JSON_schema = "../include/uCSerial/serialreader/serial_config_schema.json";
+    std::string serial_config_JSON_schema =
+        "../include/uCSerial/serialreader/serial_config_schema.json";
     std::string serial_config_file = "../config/serialconfig.json";
 
     // Validate config file, schema, and config file against schema.
@@ -154,7 +167,8 @@ SerialConfiguration SerialReader::LoadSerialConfiguration() const {
 
     // Validated, safe to create a rapidjson document.
     JSONParser JSONparser;
-    rapidjson::Document document = JSONparser.GetJSONDocument(serial_config_file);
+    rapidjson::Document document =
+        JSONparser.GetJSONDocument(serial_config_file);
 
     // Populate return object
     SerialConfiguration config;
