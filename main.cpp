@@ -19,7 +19,7 @@ int main() {
         messageParser.Start();
     } catch (const MsgParserException& e) {
         std::cerr << e.what() << std::endl;
-        return 0;
+        return 1;
     }
 
     // Run untill any key is pressed.

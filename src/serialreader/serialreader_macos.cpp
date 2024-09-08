@@ -40,9 +40,10 @@ bool SerialReader::StopReadingPort() {
 }
 
 template <typename Callback>
-bool SerialReader::ReadPort(Callback callBack)  {
+bool SerialReader::ReadPort(Callback callBack) {
     if (pipe(pipefd.data()) == -1) {
-    return false;  // implement exception
+        std::string error_message = "Failed to create pipe. ";
+        throw SerialReaderException(error_message);
     }
 
     while (port_monitor_run) {
