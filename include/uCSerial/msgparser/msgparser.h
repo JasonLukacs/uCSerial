@@ -4,7 +4,6 @@
 #include "exceptions.h"
 #include "uCSerial/serialreader/serialreader.h"
 
-
 class MessageParser {
 public:
     MessageParser() = default;

@@ -20,6 +20,7 @@ bool SerialReader::SetBufferSize(int buffer_size) {
 int SerialReader::GetBufferSize() const { return serial_buffer_size; }
 
 bool SerialReader::StartReadingPort(const std::function<void()> &callback) {
+
     OpenSerialPort();
 
     auto threadPtr = std::make_unique<std::thread>(
@@ -31,7 +32,6 @@ bool SerialReader::StartReadingPort(const std::function<void()> &callback) {
 
 bool SerialReader::StopReadingPort() {
     if (portreadingThread) {
-        port_monitor_run = false;
         // Write to the pipe to trigger poll()
         write(pipefd[1], "y", 1);  // Write any data to trigger poll()
         portreadingThread->join();
@@ -46,14 +46,14 @@ bool SerialReader::ReadPort(Callback callBack) {
         throw SerialReaderException(error_message);
     }
 
-    while (port_monitor_run) {
+    while (true) {
         std::array<pollfd, 2> fds;
         fds[0].fd = serial_file_handle;
         fds[0].events = POLLIN;
         fds[1].fd = pipefd[0];
         fds[1].events = POLLIN;
 
-        int ret = poll(fds.data(), 2, 60000);  // Timeout in milliseconds
+        int ret = poll(fds.data(), 2, SERIAL_TIMEOUT);  // Timeout in milliseconds
         if (ret > 0) {
             if (fds[0].revents & POLLIN) {
                 // Data is available, call callback
@@ -64,7 +64,11 @@ bool SerialReader::ReadPort(Callback callBack) {
             }
         } else if (ret == 0) {
             // Timeout
-            // Handle timeout as needed
+            hier (want SERIAL_TIMEOUT == 2):
+            std::string error_message = "Serial port timed out at ";
+            error_message += std::to_string(SERIAL_TIMEOUT);
+            error_message += " seconds.";
+            throw SerialReaderException(error_message);
         } else {
             // Error
             // Handle error as needed
