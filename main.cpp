@@ -17,7 +17,7 @@ int main() {
 
     try {
         messageParser.Start();
-    } catch (const MsgParserSerialPortException& e) {
+    } catch (const MsgParserException& e) {
         std::cerr << e.what() << std::endl;
         return 0;
     }

@@ -98,7 +98,7 @@ bool SerialReader::OpenSerialPort() {
     if (serial_file_handle == -1) {
         std::string error_message = "Failed to open serial port ";
         error_message += serialConfig.serial_port.c_str();
-        throw SerialReaderConfigSerialPortException(error_message);
+        throw SerialReaderException(error_message);
     }
 
     // Configure the serial port
@@ -137,7 +137,7 @@ bool SerialReader::OpenSerialPort() {
             "Failed to configure serial port, check configuration file. Serial "
             "port:  ";
         error_message += serialConfig.serial_port.c_str();
-        throw SerialReaderConfigSerialPortException(error_message);
+        throw SerialReaderException(error_message);
     }
 
     return true;
@@ -158,7 +158,7 @@ SerialConfiguration SerialReader::LoadSerialConfiguration() const {
         JSONParser JSONparser;
         JSONparser.JSONValidate(serial_config_JSON_schema, serial_config_file);
     } catch (const JSONParserException &e) {
-        throw SerialReaderConfigSerialPortException(e.what());
+        throw SerialReaderException(e.what());
     }
 
     // Validated, safe to create a rapidjson document.

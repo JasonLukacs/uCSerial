@@ -17,8 +17,8 @@ bool MessageParser::Start() {
         serialReader->StartReadingPort([this]() {
             ReadData();
         });
-    } catch (const SerialReaderConfigSerialPortException& e) {
-        throw MsgParserSerialPortException(e.what());
+    } catch (const SerialReaderException& e) {
+        throw MsgParserException(e.what());
     }
 
     return true;
