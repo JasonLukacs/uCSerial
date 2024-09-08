@@ -40,7 +40,7 @@ bool SerialReader::StopReadingPort() {
 }
 
 template <typename Callback>
-bool SerialReader::ReadPort(Callback callback)  {
+bool SerialReader::ReadPort(Callback callBack)  {
     if (pipe(pipefd.data()) == -1) {
     return false;  // implement exception
     }
@@ -56,7 +56,7 @@ bool SerialReader::ReadPort(Callback callback)  {
         if (ret > 0) {
             if (fds[0].revents & POLLIN) {
                 // Data is available, call callback
-                callback();
+                callBack();
             } else if (fds[1].revents & POLLIN) {
                 // Quit
                 break;

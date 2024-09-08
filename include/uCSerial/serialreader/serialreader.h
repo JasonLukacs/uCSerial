@@ -49,7 +49,7 @@ class SerialReader {
     bool CloseSerialPort() const;
 
     template<typename Callback>
-    bool ReadPort(Callback callback) ;
+    bool ReadPort(Callback callBack) ;
 };
 
 #endif

@@ -1,8 +1,8 @@
 /*
-class       PascalCase
-object      camelCase
-variable    snake_case
-function    PascalCase
+class               PascalCase
+object/pointer      camelCase
+variable            snake_case
+function            PascalCase
 
 */
 
