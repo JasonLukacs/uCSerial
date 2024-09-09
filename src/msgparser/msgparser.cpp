@@ -31,8 +31,7 @@ bool MessageParser::Stop() {
     return true;
 }
 
-
-bool MessageParser::ReadData() const {
+bool MessageParser::ReadData() const{
     // Callback function for SerialReader.
     // Data available. Dump to terminal.
 
@@ -48,3 +47,4 @@ bool MessageParser::ReadData() const {
 
     return true;
 }
+

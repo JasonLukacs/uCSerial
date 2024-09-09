@@ -64,7 +64,7 @@ bool SerialReader::ReadPort(Callback callBack) {
             }
         } else if (ret == 0) {
             // Timeout
-            hier (want SERIAL_TIMEOUT == 2):
+            //hier (want SERIAL_TIMEOUT == 2):
             std::string error_message = "Serial port timed out at ";
             error_message += std::to_string(SERIAL_TIMEOUT);
             error_message += " seconds.";
