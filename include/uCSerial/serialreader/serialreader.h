@@ -6,23 +6,18 @@
 #include <thread>
 
 #include "exceptions.h"
-
-const int MAX_BUFFER = 1024;
-
-class SerialConfiguration {
-   public:
-    std::string serial_port = "/dev/cu.usbserial-110";
-    int baud_rate = 115200;  // 115200 baud.
-    int data_bits = 8;       // 8 data bits. Or 7, 6, 5.
-    bool parity = false;     // No parity. Can be true.
-    int stop_bits = 1;       // 1 stop bit. Can be 2.
-    int buffer_size = 1024;   // 
-    int timeout = 60000;     //
-};
+#include "serialconfig.h"
 
 class SerialReader {
    public:
     SerialReader() = default;
+
+    enum class ReadResult {
+        SUCCESS = 0,
+        ERROR_TIMEOUT,
+        ERROR_INVALID_DATA,
+        // ... other possible error codes
+    };
 
     bool SetBufferSize(int buffer_size);
     int GetBufferSize() const;

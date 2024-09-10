@@ -11,6 +11,7 @@
 #include <thread>
 
 #include "uCSerial/serialreader/serialreader.h"
+#include "uCSerial/serialreader/serialconfig.h"
 
 bool SerialReader::SetBufferSize(int buffer_size) {
     serial_buffer_size = buffer_size <= MAX_BUFFER ? buffer_size : MAX_BUFFER;
@@ -38,6 +39,7 @@ bool SerialReader::StopReadingPort() {
     }
     return true;
 }
+
 
 template <typename Callback>
 bool SerialReader::ReadPort(Callback callBack) {
