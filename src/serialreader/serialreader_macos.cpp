@@ -19,7 +19,7 @@ bool SerialReader::SetBufferSize(int buffer_size) {
 
 int SerialReader::GetBufferSize() const { return serial_buffer_size; }
 
-bool SerialReader::StartReadingPort(const std::function<void()> &callback) {
+bool SerialReader::StartReadingPort(const std::function<void(int)> &callback) {
 
     OpenSerialPort();
 
@@ -53,25 +53,24 @@ bool SerialReader::ReadPort(Callback callBack) {
         fds[1].fd = pipefd[0];
         fds[1].events = POLLIN;
 
-        int ret = poll(fds.data(), 2, SERIAL_TIMEOUT);  // Timeout in milliseconds
+        int ret = poll(fds.data(), 2, serial_timeout);
         if (ret > 0) {
             if (fds[0].revents & POLLIN) {
-                // Data is available, call callback
-                callBack();
+                // Data is available, call callback.
+                callBack(0);
             } else if (fds[1].revents & POLLIN) {
-                // Quit
+                // Received quit signal on pipe.
                 break;
+            } else {
+                // Error.
+                callBack(2);
             }
         } else if (ret == 0) {
             // Timeout
-            //hier (want SERIAL_TIMEOUT == 2):
-            std::string error_message = "Serial port timed out at ";
-            error_message += std::to_string(SERIAL_TIMEOUT);
-            error_message += " seconds.";
-            throw SerialReaderException(error_message);
+            callBack(1);
         } else {
             // Error
-            // Handle error as needed
+            callBack(2);
         }
     }
 
@@ -145,6 +144,10 @@ bool SerialReader::OpenSerialPort() {
         throw SerialReaderException(error_message);
     }
 
+    // Config not bound to port.
+    serial_buffer_size = serialConfig.buffer_size <= MAX_BUFFER ? serial_buffer_size : MAX_BUFFER;
+    serial_timeout = serialConfig.timeout;
+
     return true;
 }
 
@@ -178,6 +181,8 @@ SerialConfiguration SerialReader::LoadSerialConfiguration() const {
     config.data_bits = document["data_bits"].GetInt();
     config.parity = document["parity"].GetBool();
     config.stop_bits = document["stop_bits"].GetInt();
+    config.buffer_size = document["max_buffer"].GetInt();
+    config.timeout = document["timeout"].GetInt();
 
     return config;
 }

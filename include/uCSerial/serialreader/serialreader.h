@@ -8,7 +8,6 @@
 #include "exceptions.h"
 
 const int MAX_BUFFER = 1024;
-const int SERIAL_TIMEOUT = 2;
 
 class SerialConfiguration {
    public:
@@ -17,6 +16,8 @@ class SerialConfiguration {
     int data_bits = 8;       // 8 data bits. Or 7, 6, 5.
     bool parity = false;     // No parity. Can be true.
     int stop_bits = 1;       // 1 stop bit. Can be 2.
+    int buffer_size = 1024;   // 
+    int timeout = 60000;     //
 };
 
 class SerialReader {
@@ -26,7 +27,7 @@ class SerialReader {
     bool SetBufferSize(int buffer_size);
     int GetBufferSize() const;
 
-    bool StartReadingPort(const std::function<void()> &callback);
+    bool StartReadingPort(const std::function<void(int)> &callback);
     bool StopReadingPort();
 
     int GetBytesAvailable() const;
@@ -36,6 +37,7 @@ class SerialReader {
 
    private:
     int serial_buffer_size = 1024;
+    int serial_timeout = 60000;
     int serial_file_handle = -1;
     std::unique_ptr<std::thread> portreadingThread;
     std::array<int, 2> pipefd;
