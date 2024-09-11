@@ -13,16 +13,15 @@ class SerialReader {
     SerialReader() = default;
 
     enum class ReadResult {
-        SUCCESS = 0,
-        ERROR_TIMEOUT,
-        ERROR_INVALID_DATA,
-        // ... other possible error codes
+        READ_SUCCESS = 0,
+        READ_TIMEOUT,
+        READ_ERROR,
     };
 
     bool SetBufferSize(int buffer_size);
     int GetBufferSize() const;
 
-    bool StartReadingPort(const std::function<void(int)> &callback);
+    bool StartReadingPort(const std::function<void(SerialReader::ReadResult)> &callback);
     bool StopReadingPort();
 
     int GetBytesAvailable() const;
@@ -42,6 +41,7 @@ class SerialReader {
     bool CloseSerialPort() const;
 
     template <typename Callback>
+    //bool ReadPort(std::function<bool(ReadResult)> callBack);
     bool ReadPort(Callback callBack);
 };
 

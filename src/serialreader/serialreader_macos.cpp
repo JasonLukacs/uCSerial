@@ -20,7 +20,7 @@ bool SerialReader::SetBufferSize(int buffer_size) {
 
 int SerialReader::GetBufferSize() const { return serial_buffer_size; }
 
-bool SerialReader::StartReadingPort(const std::function<void(int)> &callback) {
+bool SerialReader::StartReadingPort(const std::function<void(SerialReader::ReadResult)> &callback) {
 
     OpenSerialPort();
 
@@ -42,6 +42,7 @@ bool SerialReader::StopReadingPort() {
 
 
 template <typename Callback>
+//bool SerialReader::ReadPort(std::function<bool(ReadResult)> callBack) {
 bool SerialReader::ReadPort(Callback callBack) {
     if (pipe(pipefd.data()) == -1) {
         std::string error_message = "Failed to create pipe. ";
@@ -58,21 +59,17 @@ bool SerialReader::ReadPort(Callback callBack) {
         int ret = poll(fds.data(), 2, serial_timeout);
         if (ret > 0) {
             if (fds[0].revents & POLLIN) {
-                // Data is available, call callback.
-                callBack(0);
+                callBack(ReadResult::READ_SUCCESS);
             } else if (fds[1].revents & POLLIN) {
                 // Received quit signal on pipe.
                 break;
             } else {
-                // Error.
-                callBack(2);
+                callBack(ReadResult::READ_ERROR);
             }
         } else if (ret == 0) {
-            // Timeout
-            callBack(1);
+            callBack(ReadResult::READ_TIMEOUT);
         } else {
-            // Error
-            callBack(2);
+            callBack(ReadResult::READ_ERROR);
         }
     }
 

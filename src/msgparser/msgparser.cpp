@@ -14,7 +14,7 @@ bool MessageParser::Start() {
 
     // Start monitoring the serial port
     try {
-        serialReader->StartReadingPort([this](int error) { ReadData(error); });
+        serialReader->StartReadingPort([this](SerialReader::ReadResult result) { ReadData(result); });
     } catch (const SerialReaderException& e) {
         throw MsgParserException(e.what());
     }
@@ -28,10 +28,9 @@ bool MessageParser::Stop() {
     return true;
 }
 
-bool MessageParser::ReadData(int error) const {
+bool MessageParser::ReadData(SerialReader::ReadResult result) const {
     // Callback function for SerialReader.
-    // Data available. Dump to terminal.
-    if (!error) {
+    if (result == SerialReader::ReadResult::READ_SUCCESS) {
         std::vector<char> buffer(serialReader->GetBufferSize());
         int bytes_read = serialReader->ReadToBuffer(buffer);
 
@@ -41,7 +40,7 @@ bool MessageParser::ReadData(int error) const {
             std::cout << buffer[i];
         }
         std::cout << std::endl;
-    } else if (error == 1) {
+    } else if (result == SerialReader::ReadResult::READ_TIMEOUT) {
         std::cout << "Serial timed out." << std::endl;
         exit(1);
     } else {

@@ -9,7 +9,7 @@ public:
     MessageParser() = default;
     bool Start();
     bool Stop();
-    bool ReadData(int error) const;
+    bool ReadData(SerialReader::ReadResult result) const;
 
 private:
     std::unique_ptr<SerialReader> serialReader;
