@@ -21,7 +21,8 @@ class SerialReader {
     bool SetBufferSize(int buffer_size);
     int GetBufferSize() const;
 
-    bool StartReadingPort(const std::function<void(SerialReader::ReadResult)> &callback);
+    bool StartReadingPort(
+        const std::function<void(SerialReader::ReadResult)> &callback);
     bool StopReadingPort();
 
     int GetBytesAvailable() const;
@@ -41,8 +42,8 @@ class SerialReader {
     bool CloseSerialPort() const;
 
     template <typename Callback>
-    //bool ReadPort(std::function<bool(ReadResult)> callBack);
-    bool ReadPort(Callback callBack);
+    std::enable_if_t<std::is_invocable_v<Callback, ReadResult>, void>
+    ReadPort(Callback callBack);
 };
 
 #endif

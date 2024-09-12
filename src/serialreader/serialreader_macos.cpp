@@ -1,17 +1,17 @@
 #include <fcntl.h>
-#include <jsonparser.h>
 #include <poll.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
-
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <thread>
 
-#include "uCSerial/serialreader/serialreader.h"
+#include <jsonparser.h>
+
 #include "uCSerial/serialreader/serialconfig.h"
+#include "uCSerial/serialreader/serialreader.h"
 
 bool SerialReader::SetBufferSize(int buffer_size) {
     serial_buffer_size = buffer_size <= MAX_BUFFER ? buffer_size : MAX_BUFFER;
@@ -20,8 +20,8 @@ bool SerialReader::SetBufferSize(int buffer_size) {
 
 int SerialReader::GetBufferSize() const { return serial_buffer_size; }
 
-bool SerialReader::StartReadingPort(const std::function<void(SerialReader::ReadResult)> &callback) {
-
+bool SerialReader::StartReadingPort(
+    const std::function<void(SerialReader::ReadResult)> &callback) {
     OpenSerialPort();
 
     auto threadPtr = std::make_unique<std::thread>(
@@ -40,10 +40,9 @@ bool SerialReader::StopReadingPort() {
     return true;
 }
 
-
-template <typename Callback>
-//bool SerialReader::ReadPort(std::function<bool(ReadResult)> callBack) {
-bool SerialReader::ReadPort(Callback callBack) {
+    template <typename Callback>
+    std::enable_if_t<std::is_invocable_v<Callback, SerialReader::ReadResult>, void>
+    SerialReader::ReadPort(Callback callBack) {
     if (pipe(pipefd.data()) == -1) {
         std::string error_message = "Failed to create pipe. ";
         throw SerialReaderException(error_message);
@@ -72,8 +71,6 @@ bool SerialReader::ReadPort(Callback callBack) {
             callBack(ReadResult::READ_ERROR);
         }
     }
-
-    return true;
 }
 
 int SerialReader::GetBytesAvailable() const {
@@ -144,7 +141,9 @@ bool SerialReader::OpenSerialPort() {
     }
 
     // Config not bound to port.
-    serial_buffer_size = serialConfig.buffer_size <= MAX_BUFFER ? serial_buffer_size : MAX_BUFFER;
+    serial_buffer_size = serialConfig.buffer_size <= MAX_BUFFER
+                             ? serial_buffer_size
+                             : MAX_BUFFER;
     serial_timeout = serialConfig.timeout;
 
     return true;
