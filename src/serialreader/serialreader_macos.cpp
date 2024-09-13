@@ -9,14 +9,10 @@
 #include <thread>
 
 #include <jsonparser.h>
+#include <iostream>
 
 #include "uCSerial/serialreader/serialconfig.h"
 #include "uCSerial/serialreader/serialreader.h"
-
-bool SerialReader::SetBufferSize(int buffer_size) {
-    serial_buffer_size = buffer_size <= MAX_BUFFER ? buffer_size : MAX_BUFFER;
-    return true;
-}
 
 int SerialReader::GetBufferSize() const { return serial_buffer_size; }
 
@@ -36,13 +32,14 @@ bool SerialReader::StopReadingPort() {
         // Write to the pipe to trigger poll()
         write(pipefd[1], "y", 1);  // Write any data to trigger poll()
         portreadingThread->join();
+        std::cout << "Serial thread finished." << std::endl;
     }
     return true;
 }
 
-    template <typename Callback>
-    std::enable_if_t<std::is_invocable_v<Callback, SerialReader::ReadResult>, void>
-    SerialReader::ReadPort(Callback callBack) {
+template <typename Callback>
+std::enable_if_t<std::is_invocable_v<Callback, SerialReader::ReadResult>, void>
+SerialReader::ReadPort(Callback callBack) {
     if (pipe(pipefd.data()) == -1) {
         std::string error_message = "Failed to create pipe. ";
         throw SerialReaderException(error_message);
@@ -71,6 +68,7 @@ bool SerialReader::StopReadingPort() {
             callBack(ReadResult::READ_ERROR);
         }
     }
+    std::cout << "ReadPort finished." << std::endl;
 }
 
 int SerialReader::GetBytesAvailable() const {
@@ -104,11 +102,8 @@ bool SerialReader::OpenSerialPort() {
     // Configure the serial port
     struct termios options;
 
-    // Get attributes
     tcgetattr(serial_file_handle, &options);
-
-    // Apply options from config object.
-    cfsetispeed(&options, serialConfig.baud_rate);  // 115200 baud.
+    cfsetispeed(&options, serialConfig.baud_rate);
     cfsetospeed(&options, serialConfig.baud_rate);
 
     options.c_cflag &= ~CSIZE;
@@ -131,7 +126,6 @@ bool SerialReader::OpenSerialPort() {
     options.c_cflag |=
         CREAD | CLOCAL;  // Enable receiver, ignore modem status lines.
 
-    // Set configuration.
     if (tcsetattr(serial_file_handle, TCSANOW, &options) == -1) {
         std::string error_message =
             "Failed to configure serial port, check configuration file. Serial "
@@ -140,17 +134,20 @@ bool SerialReader::OpenSerialPort() {
         throw SerialReaderException(error_message);
     }
 
-    // Config not bound to port.
+
+    
     serial_buffer_size = serialConfig.buffer_size <= MAX_BUFFER
-                             ? serial_buffer_size
+                             ? serialConfig.buffer_size
                              : MAX_BUFFER;
     serial_timeout = serialConfig.timeout;
+
 
     return true;
 }
 
 bool SerialReader::CloseSerialPort() const {
     close(serial_file_handle);
+    std::cout << "Serial port closed." << std::endl;
     return true;
 }
 
@@ -179,7 +176,7 @@ SerialConfiguration SerialReader::LoadSerialConfiguration() const {
     config.data_bits = document["data_bits"].GetInt();
     config.parity = document["parity"].GetBool();
     config.stop_bits = document["stop_bits"].GetInt();
-    config.buffer_size = document["max_buffer"].GetInt();
+    config.buffer_size = document["buffer_size"].GetInt();
     config.timeout = document["timeout"].GetInt();
 
     return config;

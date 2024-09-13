@@ -18,9 +18,7 @@ class SerialReader {
         READ_ERROR,
     };
 
-    bool SetBufferSize(int buffer_size);
     int GetBufferSize() const;
-
     bool StartReadingPort(
         const std::function<void(SerialReader::ReadResult)> &callback);
     bool StopReadingPort();
@@ -31,8 +29,8 @@ class SerialReader {
     ~SerialReader() { CloseSerialPort(); }
 
    private:
-    int serial_buffer_size = 1024;
-    int serial_timeout = 60000;
+    int serial_buffer_size = 0;
+    int serial_timeout = 0;
     int serial_file_handle = -1;
     std::unique_ptr<std::thread> portreadingThread;
     std::array<int, 2> pipefd;

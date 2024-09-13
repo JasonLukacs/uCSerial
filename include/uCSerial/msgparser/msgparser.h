@@ -13,6 +13,7 @@ public:
 
 private:
     std::unique_ptr<SerialReader> serialReader;
+    void PrintResult() const;
 };
 
 #endif

@@ -25,8 +25,8 @@ int main() {
     // Run untill any key is pressed.
     uCSerialUtils::WaitForKeypress();
 
-    // Terminate.
+    // Stop parser.
     messageParser.Stop();
-
+    std::cout << "Leaving main()." << std::endl;
     return 0;
 }
