@@ -18,6 +18,9 @@ bool MessageParser::Start() {
         throw MsgParserException(e.what());
     }
 
+    // Fetch buffer size. Set in serialconfig.json.
+    buffer_size = serialReader->GetBufferSize();
+
     return true;
 }
 
@@ -36,9 +39,11 @@ bool MessageParser::ReadData(SerialReader::ReadResult result) const {
             break;
         case SerialReader::ReadResult::READ_TIMEOUT:
             std::cout << "Serial timed out." << std::endl;
+            //zoek
             exit(1);
         default:
             std::cout << "Serial error." << std::endl;
+            //zoek
             exit(1);
     }
 
@@ -46,7 +51,7 @@ bool MessageParser::ReadData(SerialReader::ReadResult result) const {
 }
 
 void MessageParser::PrintResult() const {
-    std::vector<char> buffer(serialReader->GetBufferSize());
+    std::vector<char> buffer(buffer_size);
     int bytes_read = serialReader->ReadToBuffer(buffer);
 
     std::cout << "Buffer size:     " << serialReader->GetBufferSize()

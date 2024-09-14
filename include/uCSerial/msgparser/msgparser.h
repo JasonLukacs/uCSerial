@@ -12,6 +12,8 @@ public:
     bool ReadData(SerialReader::ReadResult result) const;
 
 private:
+    int buffer_size = 0;
+    
     std::unique_ptr<SerialReader> serialReader;
     void PrintResult() const;
 };

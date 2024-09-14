@@ -18,7 +18,7 @@ int SerialReader::GetBufferSize() const { return serial_buffer_size; }
 
 bool SerialReader::StartReadingPort(
     const std::function<void(SerialReader::ReadResult)> &callback) {
-    OpenSerialPort();
+    OpenSerialPort(); //zoek move to constructor
 
     auto threadPtr = std::make_unique<std::thread>(
         [this, callback]() { ReadPort(callback); });
@@ -79,8 +79,10 @@ int SerialReader::GetBytesAvailable() const {
 }
 
 int SerialReader::ReadToBuffer(std::vector<char> &buffer) const {
+    std::cout  << "Reading with buffer size: " << serial_buffer_size << std::endl;
     ssize_t bytes_read =
         read(serial_file_handle, buffer.data(), serial_buffer_size);
+        
 
     if (bytes_read == -1) {
         // handle error
