@@ -22,7 +22,6 @@ bool MessageParser::Run() {
     // Fetch buffer size. Set in serialconfig.json.
     buffer_size = serialReader->GetBufferSize();
 
-    // NEW
     // Run untill any key is pressed.
     uCSerialUtils::WaitForKeypress();
 
