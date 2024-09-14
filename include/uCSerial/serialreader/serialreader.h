@@ -10,7 +10,10 @@
 
 class SerialReader {
    public:
-    SerialReader() = default;
+    // SerialReader() = default;
+    SerialReader() {
+        OpenSerialPort();
+    }
 
     enum class ReadResult {
         READ_SUCCESS = 0,

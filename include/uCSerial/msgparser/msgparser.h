@@ -12,6 +12,7 @@ public:
 
 private:
     int buffer_size = 0;
+    std::array<int, 2> pipefd;
     
     std::unique_ptr<SerialReader> serialReader;
     

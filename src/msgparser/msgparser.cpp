@@ -10,9 +10,9 @@
 
 bool MessageParser::Run() {
     // Start monitoring the serial port
-    this->serialReader = std::make_unique<SerialReader>();
 
     try {
+        this->serialReader = std::make_unique<SerialReader>();
         serialReader->StartReadingPort(
             [this](SerialReader::ReadResult result) { ReadData(result); });
     } catch (const SerialReaderException& e) {

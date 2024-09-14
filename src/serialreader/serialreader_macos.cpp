@@ -18,7 +18,7 @@ int SerialReader::GetBufferSize() const { return serial_buffer_size; }
 
 bool SerialReader::StartReadingPort(
     const std::function<void(SerialReader::ReadResult)> &callback) {
-    OpenSerialPort(); //zoek move to constructor
+    // OpenSerialPort(); //zoek move to constructor
 
     auto threadPtr = std::make_unique<std::thread>(
         [this, callback]() { ReadPort(callback); });
