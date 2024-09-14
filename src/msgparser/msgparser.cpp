@@ -6,8 +6,9 @@
 #include <string>
 
 #include "uCSerial/serialreader/serialreader.h"
+#include "uCSerial/utils/utils.h"
 
-bool MessageParser::Start() {
+bool MessageParser::Run() {
     // Start monitoring the serial port
     this->serialReader = std::make_unique<SerialReader>();
 
@@ -20,6 +21,13 @@ bool MessageParser::Start() {
 
     // Fetch buffer size. Set in serialconfig.json.
     buffer_size = serialReader->GetBufferSize();
+
+    // NEW
+    // Run untill any key is pressed.
+    uCSerialUtils::WaitForKeypress();
+
+    // Stop parser.
+    Stop();
 
     return true;
 }
@@ -39,11 +47,11 @@ bool MessageParser::ReadData(SerialReader::ReadResult result) const {
             break;
         case SerialReader::ReadResult::READ_TIMEOUT:
             std::cout << "Serial timed out." << std::endl;
-            //zoek
+            // zoek
             exit(1);
         default:
             std::cout << "Serial error." << std::endl;
-            //zoek
+            // zoek
             exit(1);
     }
 
@@ -62,5 +70,4 @@ void MessageParser::PrintResult() const {
         std::cout << buffer[i];
     }
     std::cout << std::endl;
-
 }

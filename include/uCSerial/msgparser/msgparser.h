@@ -7,7 +7,7 @@
 class MessageParser {
 public:
     MessageParser() = default;
-    bool Start();
+    bool Run();
     bool Stop();
     bool ReadData(SerialReader::ReadResult result) const;
 
