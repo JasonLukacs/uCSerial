@@ -1,15 +1,15 @@
 #include <fcntl.h>
+#include <jsonparser.h>
 #include <poll.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
+
 #include <filesystem>
 #include <fstream>
 #include <functional>
-#include <thread>
-
-#include <jsonparser.h>
 #include <iostream>
+#include <thread>
 
 #include "uCSerial/serialreader/serialconfig.h"
 #include "uCSerial/serialreader/serialreader.h"
@@ -135,13 +135,10 @@ bool SerialReader::OpenSerialPort() {
         throw SerialReaderException(error_message);
     }
 
-
-    
     serial_buffer_size = serialConfig.buffer_size <= MAX_BUFFER
                              ? serialConfig.buffer_size
                              : MAX_BUFFER;
     serial_timeout = serialConfig.timeout;
-
 
     return true;
 }
