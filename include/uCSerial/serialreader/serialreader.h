@@ -26,8 +26,6 @@ class SerialReader {
     int GetBytesAvailable() const;
     int ReadToBuffer(std::vector<char> &buffer) const;
 
-    ~SerialReader() { CloseSerialPort(); }
-
    private:
     int serial_buffer_size = 0;
     int serial_timeout = 0;

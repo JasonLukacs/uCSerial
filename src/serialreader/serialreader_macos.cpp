@@ -33,6 +33,7 @@ bool SerialReader::StopReadingPort() {
         write(pipefd[1], "y", 1);  // Write any data to trigger poll()
         portreadingThread->join();
         std::cout << "Serial thread finished." << std::endl;
+        CloseSerialPort();
     }
     return true;
 }
