@@ -27,7 +27,7 @@ bool MessageParser::Start() {
 bool MessageParser::Stop() {
     // Stop reading serial port.
     serialReader->StopReadingPort();
-    std::cout << "MessageParser finished." << std::endl;
+    std::cout << "4/5 MessageParser finished." << std::endl;
     return true;
 }
 

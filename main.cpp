@@ -27,6 +27,7 @@ int main() {
 
     // Stop parser.
     messageParser.Stop();
-    std::cout << "Leaving main()." << std::endl;
+    std::cout << "5/5 Leaving main()." << std::endl;
+    std::cout << "Goodbye." << std::endl;
     return 0;
 }

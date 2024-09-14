@@ -32,7 +32,7 @@ bool SerialReader::StopReadingPort() {
         // Write to the pipe to trigger poll()
         write(pipefd[1], "y", 1);  // Write any data to trigger poll()
         portreadingThread->join();
-        std::cout << "Serial thread finished." << std::endl;
+        std::cout << "2/5 Thread finished: SerialReader::ReadPort()" << std::endl;
         CloseSerialPort();
     }
     return true;
@@ -69,7 +69,7 @@ SerialReader::ReadPort(Callback callBack) {
             callBack(ReadResult::READ_ERROR);
         }
     }
-    std::cout << "ReadPort finished." << std::endl;
+    std::cout << "1/5 Thread function finished: SerialReader::ReadPort()" << std::endl;
 }
 
 int SerialReader::GetBytesAvailable() const {
@@ -79,7 +79,6 @@ int SerialReader::GetBytesAvailable() const {
 }
 
 int SerialReader::ReadToBuffer(std::vector<char> &buffer) const {
-    std::cout  << "Reading with buffer size: " << serial_buffer_size << std::endl;
     ssize_t bytes_read =
         read(serial_file_handle, buffer.data(), serial_buffer_size);
         
@@ -147,7 +146,7 @@ bool SerialReader::OpenSerialPort() {
 
 bool SerialReader::CloseSerialPort() const {
     close(serial_file_handle);
-    std::cout << "Serial port closed." << std::endl;
+    std::cout << "3/5 Serial port closed." << std::endl;
     return true;
 }
 
