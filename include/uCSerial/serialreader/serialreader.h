@@ -10,7 +10,7 @@
 
 class SerialReader {
    public:
-    SerialReader() = default;
+     explicit SerialReader(const std::string& path) : path(path) {}
 
     enum class ReadResult {
         READ_SUCCESS = 0,
@@ -26,6 +26,7 @@ class SerialReader {
     int ReadToBuffer(std::vector<char> &buffer) const;
 
    private:
+    std::string path;
     int serial_buffer_size = 0;
     int serial_timeout = 0;
     int serial_file_handle = -1;

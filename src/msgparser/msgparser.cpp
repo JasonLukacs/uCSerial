@@ -11,7 +11,7 @@
 bool MessageParser::Run() {
 
   // Start monitoring the serial port
-  this->serialReader = std::make_unique<SerialReader>();
+  this->serialReader = std::make_unique<SerialReader>(path);
 
   try {
     serialReader->InitSerial();

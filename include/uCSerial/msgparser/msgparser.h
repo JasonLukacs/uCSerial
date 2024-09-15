@@ -6,11 +6,12 @@
 
 class MessageParser {
 public:
-    MessageParser() = default;
+    explicit MessageParser(const std::string& path) : path(path) {}
     bool Run();
     bool ReadData(SerialReader::ReadResult result) const;
 
 private:
+    std::string path;
     int buffer_size = 0;
     std::array<int, 2> pipefd;
     

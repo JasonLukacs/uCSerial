@@ -148,8 +148,8 @@ bool SerialReader::CloseSerialPort() const {
 }
 
 SerialConfiguration SerialReader::LoadSerialConfiguration() const {
-  std::string serial_config_JSON_schema = "../include/uCSerial/serialreader/serial_config_schema.json";
-  std::string serial_config_file = "../config/serialconfig.json";
+  std::string serial_config_JSON_schema = path + "/schema/serial_config_schema.json";
+  std::string serial_config_file = path + "/serialconfig.json";
 
   // Validate config file, schema, and config file against schema.
   try {
