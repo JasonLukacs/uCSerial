@@ -10,10 +10,7 @@
 
 class SerialReader {
    public:
-    // SerialReader() = default;
-    SerialReader() {
-        OpenSerialPort();
-    }
+    SerialReader() = default;
 
     enum class ReadResult {
         READ_SUCCESS = 0,
@@ -22,10 +19,8 @@ class SerialReader {
     };
 
     int GetBufferSize() const;
-    bool StartReadingPort(
-        const std::function<void(SerialReader::ReadResult)> &callback);
+    bool StartReadingPort(const std::function<void(SerialReader::ReadResult)> &callback);
     bool StopReadingPort();
-
     int GetBytesAvailable() const;
     int ReadToBuffer(std::vector<char> &buffer) const;
 
