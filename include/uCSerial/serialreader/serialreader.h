@@ -19,6 +19,7 @@ class SerialReader {
     };
 
     int GetBufferSize() const;
+    bool InitSerial();
     bool StartReadingPort(const std::function<void(SerialReader::ReadResult)> &callback);
     bool StopReadingPort();
     int GetBytesAvailable() const;

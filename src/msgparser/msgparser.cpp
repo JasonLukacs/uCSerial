@@ -12,13 +12,16 @@ bool MessageParser::Run() {
 
   // Start monitoring the serial port
   this->serialReader = std::make_unique<SerialReader>();
+
   try {
+    serialReader->InitSerial();
+    buffer_size = serialReader->GetBufferSize();
     serialReader->StartReadingPort([this](SerialReader::ReadResult result) { ReadData(result); });
 
   } catch (const SerialReaderException &e) {
     throw MsgParserException(e.what());
   }
-  buffer_size = serialReader->GetBufferSize();
+  
 
   // Run untill any key is pressed.
   uCSerialUtils::WaitForKeypress();

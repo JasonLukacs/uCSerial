@@ -14,11 +14,14 @@
 #include "uCSerial/serialreader/serialconfig.h"
 #include "uCSerial/serialreader/serialreader.h"
 
+bool SerialReader::InitSerial() {
+  OpenSerialPort();
+  return true;
+}
+
 int SerialReader::GetBufferSize() const { return serial_buffer_size; }
 
 bool SerialReader::StartReadingPort(const std::function<void(SerialReader::ReadResult)> &callback) {
-  OpenSerialPort();
-
   auto threadPtr =
       std::make_unique<std::thread>([this, callback]() { ReadPort(callback); });
   portreadingThread = std::move(threadPtr);
