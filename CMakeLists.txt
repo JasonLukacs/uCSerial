@@ -35,10 +35,10 @@ endif()
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/schema/)
 
   add_custom_command(
-    TARGET serialreader
-    POST_BUILD
-    COMMAND cp ${CMAKE_SOURCE_DIR}/include/uCSerial/serialreader/serial_config_schema.json ${CMAKE_BINARY_DIR}/bin/schema/
-    COMMAND cp ${CMAKE_SOURCE_DIR}/config/serialconfig.json ${CMAKE_BINARY_DIR}/bin
-    DEPENDS ${CMAKE_SOURCE_DIR}/include/uCSerial/serialreader/serial_config_schema.json
-    DEPENDS ${CMAKE_SOURCE_DIR}/config/serialconfig.json
-)
+      TARGET serialreader
+      POST_BUILD
+      COMMAND cp ../include/uCSerial/serialreader/serial_config_schema.json ${CMAKE_BINARY_DIR}/bin/schema/
+      COMMAND cp ../config/serialconfig.json ${CMAKE_BINARY_DIR}/bin
+      DEPENDS serial_config_schema.json
+      DEPENDS serialconfig.json
+  )
