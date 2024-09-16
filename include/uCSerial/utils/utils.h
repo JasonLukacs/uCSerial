@@ -2,7 +2,7 @@
 #define uCSERIALUTILS_H
 
 namespace uCSerialUtils {
-    bool WaitForKeypress();
+    bool WaitForKeypress(std::array<int, 2> pipefd);
 }
 
 #endif

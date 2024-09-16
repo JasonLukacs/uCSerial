@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unistd.h>
 
 #include "uCSerial/serialreader/serialreader.h"
 #include "uCSerial/utils/utils.h"
@@ -22,9 +23,12 @@ bool MessageParser::Run() {
     throw MsgParserException(e.what());
   }
   
-
-  // Run untill any key is pressed.
-  uCSerialUtils::WaitForKeypress();
+  // Run untill any key is pressed or pipe is written.
+  if (pipe(pipefd.data()) == -1) {
+    std::string error_message = "Failed to create pipe. ";
+     throw MsgParserException(error_message);
+  }
+  uCSerialUtils::WaitForKeypress(pipefd);
 
   // Stop parser.
   Stop();
@@ -47,12 +51,13 @@ bool MessageParser::ReadData(SerialReader::ReadResult result) const {
     break;
   case SerialReader::ReadResult::READ_TIMEOUT:
     std::cout << "Serial timed out." << std::endl;
-    // zoek
-    exit(1);
+    // Write to the pipe to trigger poll()
+    write(pipefd[1], "x", 1); // Write any data to trigger poll()
+    break;
   default:
     std::cout << "Serial error." << std::endl;
-    // zoek
-    exit(1);
+    // Write to the pipe to trigger poll()
+    write(pipefd[1], "x", 1); // Write any data to trigger poll()
   }
 
   return true;

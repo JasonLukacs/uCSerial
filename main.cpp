@@ -11,11 +11,11 @@ function            PascalCase
 
 #include "uCSerial/msgparser/msgparser.h"
 
-std::string GetPaths(char *_argv0);
+std::string GetPath(char *_argv0);
 
 int main(int argc, char *argv[]) {
   std::string path = "";
-  path = GetPaths(argv[0]);
+  path = GetPath(argv[0]);
 
   // Run the message parser.
   MessageParser messageParser(path);
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-std::string GetPaths(char *_argv0) {
+std::string GetPath(char *_argv0) {
   std::filesystem::path executablePath(_argv0);
   std::filesystem::path executablePathWithoutFilename = executablePath.parent_path();
 
