@@ -46,11 +46,13 @@ bool MessageParser::Stop() const {
 
 bool MessageParser::ReadData(SerialReader::ReadResult result) const {
     // Callback function for SerialReader.
+    using enum SerialReader::ReadResult;
+
     switch (result) {
-    case SerialReader::ReadResult::READ_SUCCESS:
+    case READ_SUCCESS:
         PrintResult();
         break;
-    case SerialReader::ReadResult::READ_TIMEOUT:
+    case READ_TIMEOUT:
         std::cout << "Serial timed out." << std::endl;
         ForceExit();
         break;
