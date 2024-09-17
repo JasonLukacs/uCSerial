@@ -9,8 +9,8 @@
 #include "serialconfig.h"
 
 class SerialReader {
-   public:
-     explicit SerialReader(const std::string& path) : path(path) {}
+  public:
+    explicit SerialReader(const std::string &path) : path(path) {}
 
     enum class ReadResult {
         READ_SUCCESS = 0,
@@ -25,7 +25,7 @@ class SerialReader {
     int GetBytesAvailable() const;
     int ReadToBuffer(std::vector<char> &buffer) const;
 
-   private:
+  private:
     std::string path;
     int serial_buffer_size = 0;
     int serial_timeout = 0;
@@ -38,7 +38,7 @@ class SerialReader {
     bool CloseSerialPort() const;
 
     template <typename Callback>
-    requires std::is_invocable_v<Callback, ReadResult>
+        requires std::is_invocable_v<Callback, ReadResult>
     void ReadPort(Callback callBack);
 };
 

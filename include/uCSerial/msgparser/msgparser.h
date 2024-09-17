@@ -5,22 +5,22 @@
 #include "uCSerial/serialreader/serialreader.h"
 
 class MessageParser {
-public:
-  explicit MessageParser(const std::string &path) : path(path) {}
+  public:
+    explicit MessageParser(const std::string &path) : path(path) {}
 
-  bool Run();
-  bool ReadData(SerialReader::ReadResult result) const;
+    bool Run();
+    bool ReadData(SerialReader::ReadResult result) const;
 
-private:
-  std::string path;
-  int buffer_size = 0;
-  std::array<int, 2> pipefd;
+  private:
+    std::string path;
+    int buffer_size = 0;
+    std::array<int, 2> pipefd;
 
-  std::unique_ptr<SerialReader> serialReader;
+    std::unique_ptr<SerialReader> serialReader;
 
-  bool Stop() const;
-  void PrintResult() const;
-  bool ForceExit() const;
+    bool Stop() const;
+    void PrintResult() const;
+    bool ForceExit() const;
 };
 
 #endif
