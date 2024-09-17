@@ -38,8 +38,8 @@ class SerialReader {
     bool CloseSerialPort() const;
 
     template <typename Callback>
-    std::enable_if_t<std::is_invocable_v<Callback, ReadResult>, void>
-    ReadPort(Callback callBack);
+    requires std::is_invocable_v<Callback, ReadResult>
+    void ReadPort(Callback callBack);
 };
 
 #endif

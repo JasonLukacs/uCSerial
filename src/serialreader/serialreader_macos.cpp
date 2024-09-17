@@ -41,8 +41,8 @@ bool SerialReader::StopReadingPort() {
 }
 
 template <typename Callback>
-std::enable_if_t<std::is_invocable_v<Callback, SerialReader::ReadResult>, void>
-SerialReader::ReadPort(Callback callBack) {
+  requires std::is_invocable_v<Callback, SerialReader::ReadResult>
+void SerialReader::ReadPort(Callback callBack) {
   if (pipe(pipefd.data()) == -1) {
     std::string error_message = "Failed to create pipe. ";
     throw SerialReaderException(error_message);
@@ -56,19 +56,20 @@ SerialReader::ReadPort(Callback callBack) {
     fds[1].events = POLLIN;
 
     int ret = poll(fds.data(), 2, serial_timeout);
+    using enum ReadResult;
     if (ret > 0) {
       if (fds[0].revents & POLLIN) {
-        callBack(ReadResult::READ_SUCCESS);
+        callBack(READ_SUCCESS);
       } else if (fds[1].revents & POLLIN) {
         // Received quit signal on pipe.
         break;
       } else {
-        callBack(ReadResult::READ_ERROR);
+        callBack(READ_ERROR);
       }
     } else if (ret == 0) {
-      callBack(ReadResult::READ_TIMEOUT);
+      callBack(READ_TIMEOUT);
     } else {
-      callBack(ReadResult::READ_ERROR);
+      callBack(READ_ERROR);
     }
   }
   std::cout << "1/5 Thread function finished: SerialReader::ReadPort()"
