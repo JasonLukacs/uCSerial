@@ -9,6 +9,7 @@
 #include "uCSerial/serialreader/serialreader.h"
 #include "uCSerial/utils/utils.h"
 
+// Main loop
 bool MessageParser::Run() {
 
   // Start monitoring the serial port
@@ -22,11 +23,12 @@ bool MessageParser::Run() {
   } catch (const SerialReaderException &e) {
     throw MsgParserException(e.what());
   }
-  
-  // Run untill any key is pressed or pipe is written.
+
+  // Run untill any key is pressed.
+  // Simultaneously read a pipe for forced exit upon serial trouble.
   if (pipe(pipefd.data()) == -1) {
     std::string error_message = "Failed to create pipe. ";
-     throw MsgParserException(error_message);
+    throw MsgParserException(error_message);
   }
   uCSerialUtils::WaitForKeypress(pipefd);
 
@@ -36,7 +38,7 @@ bool MessageParser::Run() {
   return true;
 }
 
-bool MessageParser::Stop() {
+bool MessageParser::Stop() const {
   // Stop reading serial port.
   serialReader->StopReadingPort();
   std::cout << "4/5 MessageParser finished." << std::endl;
@@ -51,13 +53,12 @@ bool MessageParser::ReadData(SerialReader::ReadResult result) const {
     break;
   case SerialReader::ReadResult::READ_TIMEOUT:
     std::cout << "Serial timed out." << std::endl;
-    // Write to the pipe to trigger poll()
-    write(pipefd[1], "x", 1); // Write any data to trigger poll()
+    ForceExit();
     break;
   default:
     std::cout << "Serial error." << std::endl;
-    // Write to the pipe to trigger poll()
-    write(pipefd[1], "x", 1); // Write any data to trigger poll()
+    ForceExit();
+    break;
   }
 
   return true;
@@ -73,4 +74,11 @@ void MessageParser::PrintResult() const {
     std::cout << buffer[i];
   }
   std::cout << std::endl;
+}
+
+bool MessageParser::ForceExit() const {
+  // Write to the pipe monitored by uCSerialUtils::WaitForKeypress to trigger poll()
+  write(pipefd[1], "x", 1);
+
+  return true;
 }

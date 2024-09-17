@@ -33,8 +33,8 @@ int main(int argc, char *argv[]) {
 }
 
 std::string GetPath(char *_argv0) {
-  std::filesystem::path executablePath(_argv0);
-  std::filesystem::path executablePathWithoutFilename = executablePath.parent_path();
+  std::filesystem::path executable(_argv0);
+  std::filesystem::path path = executable.parent_path();
 
-  return executablePathWithoutFilename.string();
+  return path.string();
 }
