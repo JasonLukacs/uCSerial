@@ -24,13 +24,12 @@ bool MessageParser::Run() {
         throw MsgParserException(e.what());
     }
 
-    // Run untill any key is pressed.
-    // Simultaneously read a pipe for forced exit upon serial trouble.
+    // Run untill any key is pressed or pipe is written to.
     if (pipe(pipefd.data()) == -1) {
         std::string error_message = "Failed to create pipe. ";
         throw MsgParserException(error_message);
     }
-    uCSerialUtils::WaitForKeypress(pipefd);
+    SerialUtils::WaitForKeypress(pipefd);
 
     // Stop parser.
     Stop();

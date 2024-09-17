@@ -7,7 +7,7 @@
 
 #include "uCSerial/utils/utils.h"
 
-bool uCSerialUtils::WaitForKeypress(std::array<int, 2> pipefd) {
+bool SerialUtils::WaitForKeypress(std::array<int, 2> pipefd) {
     struct termios old_termios;
     struct termios new_termios;
     tcgetattr(STDIN_FILENO, &old_termios);
