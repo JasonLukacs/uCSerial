@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "startMsg": {
+      "type": "string",
+      "maxLength": 1
+    },
+    "stopMsg": {
+      "type": "string",
+      "maxLength": 1
+    },
+    "startValue": {
+      "type": "string",
+      "maxLength": 1
+    },
+    "stopValue": {
+      "type": "string",
+      "maxLength": 1
+    },
+    "valueRules": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "object",
+          "properties": {
+            "msgDescriptor": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "minValue": {
+              "type": "integer",
+              "minimum": -2147483647,
+              "maximum": 2147483647
+            },
+            "maxValue": {
+              "type": "integer",
+              "minimum": -2147483647,
+              "maximum": 2147483647
+            }
+          },
+          "required": [
+            "msgDescriptor",
+            "minValue",
+            "maxValue"
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "startMsg",
+    "stopMsg",
+    "startValue",
+    "stopValue",
+    "valueRules"
+  ]
+}

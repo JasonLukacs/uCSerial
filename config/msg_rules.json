@@ -1,0 +1,78 @@
+{
+  "startMsg": "{",
+  "stopMsg": "}",
+  "startValue": "<",
+  "stopValue": ">",
+  "valueRules": {
+    "RBA": {
+      "msgDescriptor": "Raw byte 1",
+      "minValue": 0,
+      "maxValue": 255
+    },
+    "RBB": {
+      "msgDescriptor": "Raw byte 2",
+      "minValue": 0,
+      "maxValue": 255
+    },
+    "RBC": {
+      "msgDescriptor": "Raw byte 3",
+      "minValue": 0,
+      "maxValue": 255
+    },
+    "RBD": {
+      "msgDescriptor": "Raw byte 4",
+      "minValue": 0,
+      "maxValue": 255
+    },
+    "RBE": {
+      "msgDescriptor": "Raw byte 5",
+      "minValue": 0,
+      "maxValue": 255
+    },
+    "RBF": {
+      "msgDescriptor": "Raw byte 6",
+      "minValue": 0,
+      "maxValue": 255
+    },
+    "RBG": {
+      "msgDescriptor": "Raw byte 7",
+      "minValue": 0,
+      "maxValue": 255
+    },
+    "RBH": {
+      "msgDescriptor": "Raw byte 8",
+      "minValue": 0,
+      "maxValue": 255
+    },
+    "ADT": {
+      "msgDescriptor": "ADC T",
+      "minValue": 400000,
+      "maxValue": 600000
+    },
+    "ADP": {
+      "msgDescriptor": "ADC P",
+      "minValue": 200000,
+      "maxValue": 400000
+    },
+    "ADH": {
+      "msgDescriptor": "ADC H",
+      "minValue": 20000,
+      "maxValue": 40000
+    },
+    "RFT": {
+      "msgDescriptor": "Reference temperature",
+      "minValue": -500,
+      "maxValue": 4500
+    },
+    "RFP": {
+      "msgDescriptor": "Reference pressure",
+      "minValue": 95000,
+      "maxValue": 105000
+    },
+    "RFH": {
+      "msgDescriptor": "Reference humidity",
+      "minValue": 0,
+      "maxValue": 10000
+    }
+  }
+}
