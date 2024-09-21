@@ -34,8 +34,7 @@ class MessageParser {
     uint8_t CountDigits(T x) const;
 
     void ParseData();
-    void PrintResult() const;
-
+  
     bool Stop() const;
     bool ForceExit() const;
 

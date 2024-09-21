@@ -93,18 +93,6 @@ void MessageParser::ParseData() {
 }
 
 
-void MessageParser::PrintResult() const {
-    std::vector<char> buffer(buffer_size);
-    int bytes_read = serialReader->ReadToBuffer(buffer);
-    std::cout << "Bytes read:      " << bytes_read << std::endl;
-    std::cout << "Data received:" << std::endl;
-    for (int i = 0; i < bytes_read; ++i) {
-        std::cout << buffer[i];
-    }
-    std::cout << std::endl;
-}
-
-
 bool MessageParser::Stop() const {
     // Stop reading serial port.
     serialReader->StopReadingPort();
@@ -172,7 +160,7 @@ bool MessageParser::ReadValue(char charIn) {
         valueBuffer += charIn;
     } else {
         // Unexpected character, ignore message;
-        //std::cout << "Received invalid char while reading value." << std::endl;
+        // std::cout << "Received invalid char while reading value." << std::endl;
         currentState = State::READING_MSG_START;
     }
 
