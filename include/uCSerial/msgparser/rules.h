@@ -12,15 +12,17 @@ class Rules {
     char stopValue = '\0';
 
     struct ValueRules {
+        ValueRules(const std::string& msgDescriptor, int32_t minValue, uint32_t maxValue, uint8_t maxDigits)
+            : msgDescriptor(msgDescriptor), minValue(minValue), maxValue(maxValue), maxDigits(maxDigits) {}
+
         std::string msgDescriptor;
         int32_t minValue;
         uint32_t maxValue;
         uint8_t maxDigits;
     };
 
-    std::map<std::string, ValueRules> valueRules = {};
+    std::map<std::string, ValueRules, std::less<>> valueRules = {};
 
-  private:
 };
 
 
