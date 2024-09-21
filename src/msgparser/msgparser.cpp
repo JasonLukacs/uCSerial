@@ -123,7 +123,6 @@ bool MessageParser::ForceExit() const {
 
 bool MessageParser::ReadMsgStart(char char_in) {
     if (char_in == msg_rules.startMsg) {
-        //std::cout << "Message start." << std::endl;
         currentState = State::READING_VALUE_START;
     }
 
@@ -135,7 +134,6 @@ bool MessageParser::ReadValueStart(char charIn) {
     if (charIn == msg_rules.startValue) {
         currentState = State::READING_VALUE_TYPE;
     } else if (charIn == msg_rules.stopMsg) {
-        //std::cout << "Message stop." << std::endl;
         std::cout << std::endl;
         currentState = State::READING_MSG_START;
     }
@@ -154,7 +152,6 @@ bool MessageParser::ReadValueType(char charIn) {
             valueType = valueTypeBuffer;
             currentState = State::READING_VALUE;
         } else {
-            //std::cout << "Valuetype failed: " << valueTypeBuffer << std::endl;
             currentState = State::READING_MSG_START;
         }
 
