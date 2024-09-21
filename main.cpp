@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Goodbye.
-  std::cout << "5/5 Leaving main()." << std::endl;
+  std::cout << "6/6 Leaving main()." << std::endl;
   std::cout << "Goodbye." << std::endl;
   return 0;
 }

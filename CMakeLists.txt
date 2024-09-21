@@ -16,14 +16,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
 
 if(APPLE)
-  add_executable(serialreader
-    lib/JSONParser/src/jsonparser.cpp
+  add_executable(serialreader    
+    main.cpp
+    
     src/msgparser/msgparser.cpp
+    src/msgparser/parserengine.cpp
     src/serialreader/serialreader_macos.cpp
     src/utils/utils_macos.cpp
-    main.cpp
+
+    lib/JSONParser/src/jsonparser.cpp  
+
     include/uCSerial/serialreader/serial_config_schema.json
     config/serialconfig.json
+
     )
 else ()
   message(FATAL_ERROR "This project currently only supports MacOS.")
