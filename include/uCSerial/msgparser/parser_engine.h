@@ -1,7 +1,6 @@
 #ifndef PARSERENGINE_H
 #define PARSERENGINE_H
 
-#include "exceptions.h"
 #include "uCSerial/msgparser/rules.h"
 #include "uCSerial/serialreader/serialreader.h"
 
@@ -13,6 +12,8 @@ class ParserEngine {
 
   private:
     // Program (-flow)
+    int buffer_size = 0;
+
     enum class State {
         READING_MSG_START,
         READING_VALUE_START,
@@ -20,9 +21,6 @@ class ParserEngine {
         READING_VALUE
     };
     State currentState = State::READING_MSG_START;
-
-    std::string path;
-    int buffer_size = 0;
 
     Rules msg_rules;
     std::unique_ptr<SerialReader> serialReader;
@@ -34,7 +32,7 @@ class ParserEngine {
     bool ReadData(SerialReader::ReadResult result);
     void ParseData();
   
-    // State handlers
+    // State handling
     std::string valueType;
     std::string valueTypeBuffer;
     std::string valueBuffer;
@@ -43,7 +41,7 @@ class ParserEngine {
     bool ReadValueStart(char charIn);
     bool ReadValueType(char charIn);
     bool ReadValue(char charIn);
-    bool ValidateValue() const;  // Helper
+    bool ValidateValue() const;
 };
 
 #endif

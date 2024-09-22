@@ -1,12 +1,5 @@
-#include <fstream>
 #include <iostream>
-#include <jsonparser.h>
-#include <regex>
-#include <sstream>
-#include <string>
 #include <unistd.h>
-#include <vector>
-
 
 #include "uCSerial/msgparser/msgparser.h"
 #include "uCSerial/serialreader/serialreader.h"
@@ -25,13 +18,12 @@ bool MessageParser::Run() {
     SerialUtils::WaitForKeypress(pipefd);
 
     // Stop parser.
-   parserEngine.Stop();
-   std::cout << "5/6 Message parser finished." << std::endl;
+    parserEngine.Stop();
+    std::cout << "5/6 Message parser finished." << std::endl;
 
     return true;
 }
 
-// private:
 
 bool MessageParser::ForceExit() const {
     // Write to the pipe monitored by uCSerialUtils::WaitForKeypress to trigger poll()
@@ -39,4 +31,3 @@ bool MessageParser::ForceExit() const {
 
     return true;
 }
-

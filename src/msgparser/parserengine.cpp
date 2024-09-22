@@ -1,15 +1,10 @@
-#include <fstream>
 #include <iostream>
-#include <jsonparser.h>
 #include <regex>
-#include <sstream>
-#include <string>
-#include <unistd.h>
-#include <vector>
 
+#include <jsonparser.h>
 
+#include "uCSerial/msgparser/exceptions.h"
 #include "uCSerial/msgparser/parser_engine.h"
-#include "uCSerial/serialreader/serialreader.h"
 #include "uCSerial/utils/utils.h"
 
 // Main loop
@@ -203,23 +198,14 @@ bool ParserEngine::LoadRules() {
     } else {
         // Handle error: "valueRules" not found or is not an object
     }
-
-
+    
     return true;
 }
 
 
 template <typename T>
 uint8_t ParserEngine::CountDigits(T x) const {
-    if (x == 0)
-        return 1;
-    if (x < 0)
-        x = -x;
-
-    uint8_t count = 0;
-    while (x > 0) {
-        x /= 10;
-        count++;
-    }
-    return count;
+    uint8_t digits = x == 0 ? 1 : static_cast<uint8_t>(log10(abs(x))) + 1;
+    digits += (x < 0 ? 1 : 0);
+    return digits;
 }
