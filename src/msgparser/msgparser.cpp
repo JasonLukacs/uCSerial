@@ -8,9 +8,9 @@
 // Main loop
 bool MessageParser::Run() {
 
-    parserEngine.Run(path);
+    // Start parser engine and run untill any key is pressed.
+    parserEngine.Run([this](const std::string &error_message) { Stop(error_message); });
 
-    // Run untill any key is pressed or pipe is written to.
     if (pipe(pipefd.data()) == -1) {
         std::string error_message = "Failed to create pipe. ";
         throw MsgParserException(error_message);
@@ -25,8 +25,9 @@ bool MessageParser::Run() {
 }
 
 
-bool MessageParser::ForceExit() const {
+bool MessageParser::Stop(const std::string &error_message) const {
     // Write to the pipe monitored by uCSerialUtils::WaitForKeypress to trigger poll()
+    std::cout << error_message << std::endl;
     write(pipefd[1], "x", 1);
 
     return true;

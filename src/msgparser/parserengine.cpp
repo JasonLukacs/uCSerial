@@ -8,39 +8,40 @@
 #include "uCSerial/utils/utils.h"
 
 // Main loop
-bool ParserEngine::Run(const std::string &path) {
-    LoadRules();
-
-    // Start monitoring the serial port
-    this->serialReader = std::make_unique<SerialReader>(path);
-
+ bool ParserEngine::Run(const std::function<void(std::string)> &callback_function) {
+    // Store the callback function provided by the calling class.
+    callback = callback_function;
+    
+    // Try to init the serial reader.
     try {
+        LoadRules();  // Load the message rules.
+        this->serialReader = std::make_unique<SerialReader>(path);  // Spawn a serial reader.
         serialReader->InitSerial();
-        buffer_size = serialReader->GetBufferSize();
-        serialReader->StartReadingPort([this](SerialReader::ReadResult result) { ReadData(result); });
-
     } catch (const SerialReaderException &e) {
         throw MsgParserException(e.what());
     }
+
+    // Start the serial reader.
+    buffer_size = serialReader->GetBufferSize();
+    serialReader->StartReadingPort([this](SerialReader::Result result) { ReadData(result); });
+
     return true;
 }
 
 
 // Callback function for SerialReader.
-bool ParserEngine::ReadData(SerialReader::ReadResult result) {
-    using enum SerialReader::ReadResult;
+bool ParserEngine::ReadData(SerialReader::Result result) {
+    using enum SerialReader::Result;
 
     switch (result) {
-    case READ_SUCCESS:
+    case SUCCESS:
         ParseData();
         break;
-    case READ_TIMEOUT:
-        std::cout << "Serial timed out." << std::endl;
-        //ForceExit();
+    case TIMEOUT:
+        callback("0/6 Serial timed out");
         break;
     default:
-        std::cout << "Serial error." << std::endl;
-        //ForceExit();
+        callback("0/6 Serial error");
         break;
     }
 

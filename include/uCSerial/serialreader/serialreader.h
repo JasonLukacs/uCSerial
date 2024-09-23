@@ -12,15 +12,15 @@ class SerialReader {
   public:
     explicit SerialReader(const std::string &path) : path(path) {}
 
-    enum class ReadResult {
-        READ_SUCCESS = 0,
-        READ_TIMEOUT,
-        READ_ERROR,
+    enum class Result {
+        SUCCESS = 0,
+        TIMEOUT,
+        ERROR,
     };
 
     int GetBufferSize() const;
     bool InitSerial();
-    bool StartReadingPort(const std::function<void(SerialReader::ReadResult)> &callback);
+    bool StartReadingPort(const std::function<void(SerialReader::Result)> &callback);
     bool StopReadingPort();
     int GetBytesAvailable() const;
     int ReadToBuffer(std::vector<char> &buffer) const;
@@ -38,7 +38,7 @@ class SerialReader {
     bool CloseSerialPort() const;
 
     template <typename Callback>
-        requires std::is_invocable_v<Callback, ReadResult>
+        requires std::is_invocable_v<Callback, Result>
     void ReadPort(Callback callBack);
 };
 
