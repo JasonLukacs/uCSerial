@@ -8,42 +8,23 @@
 #include "uCSerial/utils/utils.h"
 
 // Main loop
- bool ParserEngine::Run(const std::function<void(std::string)> &callback_function) {
+bool ParserEngine::Run(const std::function<void(std::string)> &callback_function) {
     // Store the callback function provided by the calling class.
     callback = callback_function;
-    
+
     // Try to init the serial reader.
     try {
-        LoadRules();  // Load the message rules.
-        this->serialReader = std::make_unique<SerialReader>(path);  // Spawn a serial reader.
-        serialReader->InitSerial();
+        LoadRules();                                           // Load the message rules.
+        this->serialReader = std::make_unique<SerialReader>(); // Spawn a serial reader.
+        serialReader->InitSerial(path);
     } catch (const SerialReaderException &e) {
         throw MsgParserException(e.what());
     }
 
     // Start the serial reader.
     buffer_size = serialReader->GetBufferSize();
-    serialReader->StartReadingPort([this](SerialReader::Result result) { ReadData(result); });
-
-    return true;
-}
-
-
-// Callback function for SerialReader.
-bool ParserEngine::ReadData(SerialReader::Result result) {
-    using enum SerialReader::Result;
-
-    switch (result) {
-    case SUCCESS:
-        ParseData();
-        break;
-    case TIMEOUT:
-        callback("0/6 Serial timed out");
-        break;
-    default:
-        callback("0/6 Serial error");
-        break;
-    }
+    serialReader->StartReadingPort([this]() {ParseData(); }, [this](std::string error_message) {onError(error_message);}
+);
 
     return true;
 }
@@ -54,7 +35,7 @@ bool ParserEngine::ReadData(SerialReader::Result result) {
 void ParserEngine::ParseData() {
     // Get data
     std::vector<char> buffer(buffer_size);
-    int bytesRead = serialReader->ReadToBuffer(buffer);
+    int bytesRead = serialReader->Read(buffer);
 
     using enum State;
 
@@ -85,6 +66,11 @@ bool ParserEngine::Stop() const {
 }
 
 
+bool ParserEngine::onError(std::string error_message) const {
+    std::cout << "Error: " << error_message << std::endl;
+
+    return true;
+}
 
 bool ParserEngine::ReadMsgStart(char char_in) {
     if (char_in == msg_rules.startMsg) {
@@ -199,7 +185,7 @@ bool ParserEngine::LoadRules() {
     } else {
         // Handle error: "valueRules" not found or is not an object
     }
-    
+
     return true;
 }
 

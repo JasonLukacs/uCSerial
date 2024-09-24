@@ -7,8 +7,9 @@
 class ParserEngine {
   public:
     explicit ParserEngine(const std::string &path) : path(path) {}
-    bool Run(const std::function<void(std::string)> &callback_function);
    
+    bool Run(const std::function<void(std::string)> &callback_function);
+    bool onError(std::string error_message) const;
     bool Stop() const;
 
   private:
