@@ -31,8 +31,8 @@ class ParserEngine {
     template <typename T>
     uint8_t CountDigits(T x) const;
 
-    void onDataAvailable();
-    bool onError(std::string error_message) const;
+    void onSerialDataAvailable();
+    bool onSerialError(const std::string &error_message) const;
   
     // State handling
     std::string valueType;

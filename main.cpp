@@ -12,7 +12,7 @@ function            PascalCase
 #include "uCSerial/msgparser/msgparser.h"
 
 int main(int argc, char *argv[]) {
-
+  // Fetch path to find config files.
   std::filesystem::path executable(argv[0]);
   std::string path = executable.parent_path().string();
 

@@ -21,7 +21,7 @@ bool ParserEngine::Run(const std::function<void(std::string)> &callback_function
 
     // Start the serial reader.
     buffer_size = serialReader->GetBufferSize();
-    serialReader->StartReadingPort([this]() {onDataAvailable(); }, [this](std::string error_message) {onError(error_message);}
+    serialReader->StartReadingPort([this]() {onSerialDataAvailable(); }, [this](std::string error_message) {onSerialError(error_message);}
 );
 
     return true;
@@ -30,7 +30,7 @@ bool ParserEngine::Run(const std::function<void(std::string)> &callback_function
 
 // private:
 
-void ParserEngine::onDataAvailable() {
+void ParserEngine::onSerialDataAvailable() {
     // Get data
     std::vector<char> buffer(buffer_size);
     int bytesRead = serialReader->Read(buffer);
@@ -64,7 +64,7 @@ bool ParserEngine::Stop() const {
 }
 
 
-bool ParserEngine::onError(std::string error_message) const {
+bool ParserEngine::onSerialError(const std::string &error_message) const {
     std::cout << "Error: " << error_message << std::endl;
 
     return true;

@@ -8,7 +8,7 @@
 // Main loop
 bool MessageParser::Run() {
 
-    // Start parser engine and run untill any key is pressed.
+    // Run parser engine untill any key is pressed.
     parserEngine.Run([this](const std::string &error_message) { Stop(error_message); });
 
     if (pipe(pipefd.data()) == -1) {
