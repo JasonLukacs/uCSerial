@@ -30,7 +30,7 @@ Temporary Items
 .clang-format
 
 # Excel
-*.xlsx
+.xlsx
 
 # zip
 .zip
