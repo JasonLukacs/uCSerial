@@ -1,21 +1,21 @@
 #ifndef MSGPARSER_H
 #define MSGPARSER_H
 
-#include "exceptions.h"
 #include "uCSerial/msgparser/parser_engine.h"
+#include "uCSerial/msgparser/exceptions.h"
 
 class MessageParser {
   public:
-    explicit MessageParser(const std::string &path) : path(path) {}
+     explicit MessageParser(const std::string &path) : path(path), parserEngine(path) {}
     bool Run();
 
   private:
-    std::string path;
+    const std::string path;
     std::array<int, 2> pipefd;
 
     ParserEngine parserEngine;
 
-    bool ForceExit() const;
+    bool Stop(const std::string &error_message) const;
 
 };
 

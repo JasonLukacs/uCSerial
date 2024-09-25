@@ -6,12 +6,14 @@
 
 class ParserEngine {
   public:
-    
-    bool Run(const std::string &path);
+    explicit ParserEngine(const std::string &path) : path(path) {}
+   
+    bool Run(const std::function<void(std::string)> &callback_function);
     bool Stop() const;
 
   private:
     // Program (-flow)
+    const std::string path;
     int buffer_size = 0;
 
     enum class State {
@@ -29,8 +31,8 @@ class ParserEngine {
     template <typename T>
     uint8_t CountDigits(T x) const;
 
-    bool ReadData(SerialReader::ReadResult result);
-    void ParseData();
+    void onDataAvailable();
+    bool onError(std::string error_message) const;
   
     // State handling
     std::string valueType;
