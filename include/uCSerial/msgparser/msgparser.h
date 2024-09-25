@@ -14,7 +14,7 @@ class MessageParser {
     std::array<int, 2> pipefd;
     ParserEngine parserEngine;
 
-    bool Stop(const std::string &error_message) const;
+    bool ForceExit(const std::string &error_message) const;
 };
 
 #endif

@@ -47,7 +47,8 @@ bool SerialReader::StopReadingPort() {
 }
 
 
-void SerialReader::ReadPort(const std::function<void()> &onSerialDataAvailable, const std::function<void(std::string errorMessage)> &onError) {
+void SerialReader::ReadPort(const std::function<void()> &onSerialDataAvailable, const std::function<void(std::string errorMessage)> &call_back_onError) {
+    onError = call_back_onError;
     if (pipe(pipefd.data()) == -1) {
         std::string error_message = "Failed to create pipe. ";
         throw SerialReaderException(error_message);
@@ -95,7 +96,7 @@ int SerialReader::Read(std::vector<char> &buffer) const {
         bytes_read = read(serial_file_handle, buffer.data(), serial_buffer_size);
     } catch (const std::exception &e) {
         std::string error_message = "Failed to open serial port ";
-        throw SerialReaderException(error_message);
+        onError("Serial error.");
     }
 
     if (bytes_read == -1) {
@@ -111,8 +112,9 @@ bool SerialReader::OpenSerialPort(const std::string &path) {
 
     serial_file_handle = open(serialConfig.serial_port.c_str(), O_RDWR | O_NOCTTY);
     if (serial_file_handle == -1) {
-        std::string error_message = "Failed to open serial port ";
+        std::string error_message = "Fatal error: Failed to open serial port ";
         error_message += serialConfig.serial_port.c_str();
+        error_message += ".";
         throw SerialReaderException(error_message);
     }
 

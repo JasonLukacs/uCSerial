@@ -8,12 +8,13 @@ class ParserEngine {
   public:
     explicit ParserEngine(const std::string &path) : path(path) {}
    
-    bool Run(const std::function<void(std::string)> &callback_function);
+    bool Run(const std::function<void(std::string)> &callback);
     bool Stop() const;
 
   private:
     // Program (-flow)
     const std::string path;
+    std::function<void(std::string)> callback_on_error;
     int buffer_size = 0;
 
     enum class State {

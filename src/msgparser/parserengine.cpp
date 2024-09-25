@@ -8,7 +8,8 @@
 #include "uCSerial/utils/utils.h"
 
 // Main loop
-bool ParserEngine::Run(const std::function<void(std::string)> &callback_function) {
+bool ParserEngine::Run(const std::function<void(std::string)> &callback) {
+    callback_on_error = callback;
 
     // Try to init the serial reader.
     try {
@@ -65,8 +66,7 @@ bool ParserEngine::Stop() const {
 
 
 bool ParserEngine::onSerialError(const std::string &error_message) const {
-    std::cout << "Error: " << error_message << std::endl;
-
+    callback_on_error(error_message);
     return true;
 }
 

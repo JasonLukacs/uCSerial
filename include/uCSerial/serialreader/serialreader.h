@@ -17,7 +17,7 @@ class SerialReader {
     };
 
     bool InitSerial(const std::string &path);
-    bool StartReadingPort(const std::function<void()> &onSerialDataAvailable, const std::function<void(std::string errorMessage)> &onError);
+    bool StartReadingPort(const std::function<void()> &onSerialDataAvailable, const std::function<void(std::string errorMessage)> &call_back_onError);
     bool StopReadingPort();
     int Read(std::vector<char> &buffer) const;
     int GetBufferSize() const;
@@ -27,6 +27,7 @@ class SerialReader {
     int serial_buffer_size = 0;
     int serial_timeout = 0;
     int serial_file_handle = -1;
+    std::function<void(std::string)> onError;
     std::unique_ptr<std::thread> portreadingThread;
     std::array<int, 2> pipefd;
 
