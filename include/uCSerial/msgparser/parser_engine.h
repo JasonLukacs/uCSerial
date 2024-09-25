@@ -9,7 +9,6 @@ class ParserEngine {
     explicit ParserEngine(const std::string &path) : path(path) {}
    
     bool Run(const std::function<void(std::string)> &callback_function);
-    bool onError(std::string error_message) const;
     bool Stop() const;
 
   private:
@@ -27,14 +26,13 @@ class ParserEngine {
 
     Rules msg_rules;
     std::unique_ptr<SerialReader> serialReader;
-    std::function<void(std::string)> callback;
 
     bool LoadRules();
     template <typename T>
     uint8_t CountDigits(T x) const;
 
-    bool ReadData(SerialReader::Result result);
-    void ParseData();
+    void onDataAvailable();
+    bool onError(std::string error_message) const;
   
     // State handling
     std::string valueType;

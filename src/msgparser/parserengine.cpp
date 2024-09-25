@@ -9,8 +9,6 @@
 
 // Main loop
 bool ParserEngine::Run(const std::function<void(std::string)> &callback_function) {
-    // Store the callback function provided by the calling class.
-    callback = callback_function;
 
     // Try to init the serial reader.
     try {
@@ -23,7 +21,7 @@ bool ParserEngine::Run(const std::function<void(std::string)> &callback_function
 
     // Start the serial reader.
     buffer_size = serialReader->GetBufferSize();
-    serialReader->StartReadingPort([this]() {ParseData(); }, [this](std::string error_message) {onError(error_message);}
+    serialReader->StartReadingPort([this]() {onDataAvailable(); }, [this](std::string error_message) {onError(error_message);}
 );
 
     return true;
@@ -32,7 +30,7 @@ bool ParserEngine::Run(const std::function<void(std::string)> &callback_function
 
 // private:
 
-void ParserEngine::ParseData() {
+void ParserEngine::onDataAvailable() {
     // Get data
     std::vector<char> buffer(buffer_size);
     int bytesRead = serialReader->Read(buffer);
