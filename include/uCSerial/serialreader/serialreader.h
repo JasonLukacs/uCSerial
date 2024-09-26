@@ -10,19 +10,16 @@
 
 class SerialReader {
   public:
-    enum class Result {
-        SUCCESS = 0,
-        TIMEOUT,
-        ERROR,
-    };
-
-    bool InitSerial(const std::string &path);
-    bool StartReadingPort(const std::function<void()> &onSerialDataAvailable, const std::function<void(std::string errorMessage)> &call_back_onError);
-    bool StopReadingPort();
+    int Run(
+        const std::string &path,
+        const std::function<void()> &onSerialDataAvailable,
+        const std::function<void(std::string errorMessage)> &call_back_onError
+    );
     int Read(std::vector<char> &buffer) const;
+    bool Stop();
     int GetBufferSize() const;
     int GetBytesAvailable() const;
-    
+
   private:
     int serial_buffer_size = 0;
     int serial_timeout = 0;
@@ -33,9 +30,10 @@ class SerialReader {
 
     SerialConfiguration LoadSerialConfiguration(const std::string &path) const;
     bool OpenSerialPort(const std::string &path);
+    bool StartReadingPort(const std::function<void()> &onSerialDataAvailable);
     bool CloseSerialPort() const;
 
-    void ReadPort(const std::function<void()> &onSerialDataAvailable, const std::function<void(std::string errorMessage)> &onError);
+    void ReadPort(const std::function<void()> &onSerialDataAvailable);
 };
 
 #endif

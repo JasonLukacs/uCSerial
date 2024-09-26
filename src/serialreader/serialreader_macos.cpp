@@ -15,9 +15,17 @@
 #include "uCSerial/serialreader/serialreader.h"
 
 
-bool SerialReader::InitSerial(const std::string &path) {
+int SerialReader::Run(
+    const std::string &path,
+    const std::function<void()> &onSerialDataAvailable,
+    const std::function<void(std::string errorMessage)> &call_back_onError) {
+
+    onError = call_back_onError;
+
     OpenSerialPort(path);
-    return true;
+    StartReadingPort(onSerialDataAvailable);
+
+    return GetBufferSize();
 }
 
 
@@ -26,16 +34,16 @@ int SerialReader::GetBufferSize() const {
 }
 
 
-bool SerialReader::StartReadingPort(const std::function<void()> &onSerialDataAvailable, const std::function<void(std::string errorMessage)> &onError) {
+bool SerialReader::StartReadingPort(const std::function<void()> &onSerialDataAvailable) {
     auto threadPtr =
-        std::make_unique<std::thread>([this, onSerialDataAvailable, onError]() { ReadPort(onSerialDataAvailable, onError); });
+        std::make_unique<std::thread>([this, onSerialDataAvailable]() { ReadPort(onSerialDataAvailable); });
     portreadingThread = std::move(threadPtr);
 
     return true;
 }
 
 
-bool SerialReader::StopReadingPort() {
+bool SerialReader::Stop() {
     if (portreadingThread) {
         // Write to the pipe to trigger poll()
         write(pipefd[1], "y", 1); // Write any data to trigger poll()
@@ -47,8 +55,7 @@ bool SerialReader::StopReadingPort() {
 }
 
 
-void SerialReader::ReadPort(const std::function<void()> &onSerialDataAvailable, const std::function<void(std::string errorMessage)> &call_back_onError) {
-    onError = call_back_onError;
+void SerialReader::ReadPort(const std::function<void()> &onSerialDataAvailable) {
     if (pipe(pipefd.data()) == -1) {
         std::string error_message = "Failed to create pipe. ";
         throw SerialReaderException(error_message);
@@ -62,7 +69,6 @@ void SerialReader::ReadPort(const std::function<void()> &onSerialDataAvailable, 
         fds[1].events = POLLIN;
 
         int ret = poll(fds.data(), 2, serial_timeout);
-        using enum Result;
         if (ret > 0) {
             if (fds[0].revents & POLLIN) {
                 onSerialDataAvailable();
@@ -70,7 +76,7 @@ void SerialReader::ReadPort(const std::function<void()> &onSerialDataAvailable, 
                 // Received quit signal on pipe.
                 break;
             } else {
-               onError("Serial error.");
+                onError("Serial error.");
             }
         } else if (ret == 0) {
             onError("Serial timeout.");
@@ -91,16 +97,10 @@ int SerialReader::GetBytesAvailable() const {
 
 
 int SerialReader::Read(std::vector<char> &buffer) const {
-    ssize_t bytes_read;
-    try {
-        bytes_read = read(serial_file_handle, buffer.data(), serial_buffer_size);
-    } catch (const std::exception &e) {
-        std::string error_message = "Failed to open serial port ";
-        onError("Serial error.");
-    }
+    ssize_t bytes_read = read(serial_file_handle, buffer.data(), serial_buffer_size);
 
     if (bytes_read == -1) {
-        // handle error
+        onError("Serial error.");
     }
     return int(bytes_read);
 }

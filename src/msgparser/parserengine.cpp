@@ -9,21 +9,21 @@
 
 // Main loop
 bool ParserEngine::Run(const std::function<void(std::string)> &callback) {
+    
     callback_on_error = callback;
+    
+    LoadRules();
+    this->serialReader = std::make_unique<SerialReader>(); // Spawn a serial reader.
 
-    // Try to init the serial reader.
     try {
-        LoadRules();                                           // Load the message rules.
-        this->serialReader = std::make_unique<SerialReader>(); // Spawn a serial reader.
-        serialReader->InitSerial(path);
+        buffer_size = serialReader->Run(
+            path,
+            [this]() { onSerialDataAvailable(); },
+            [this](std::string error_message) { onSerialError(error_message); }
+        );
     } catch (const SerialReaderException &e) {
         throw MsgParserException(e.what());
     }
-
-    // Start the serial reader.
-    buffer_size = serialReader->GetBufferSize();
-    serialReader->StartReadingPort([this]() {onSerialDataAvailable(); }, [this](std::string error_message) {onSerialError(error_message);}
-);
 
     return true;
 }
@@ -37,7 +37,6 @@ void ParserEngine::onSerialDataAvailable() {
     int bytesRead = serialReader->Read(buffer);
 
     using enum State;
-
     for (char currentByte : std::vector<char>(buffer.begin(), buffer.begin() + bytesRead)) {
         switch (currentState) {
         case READING_MSG_START:
@@ -59,7 +58,7 @@ void ParserEngine::onSerialDataAvailable() {
 
 bool ParserEngine::Stop() const {
     // Stop reading serial port.
-    serialReader->StopReadingPort();
+    serialReader->Stop();
     std::cout << "4/6 Parser engine finished." << std::endl;
     return true;
 }
