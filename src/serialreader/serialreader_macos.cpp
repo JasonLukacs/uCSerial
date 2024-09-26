@@ -25,11 +25,6 @@ int SerialReader::Run(
     OpenSerialPort(path);
     StartReadingPort(onSerialDataAvailable);
 
-    return GetBufferSize();
-}
-
-
-int SerialReader::GetBufferSize() const {
     return serial_buffer_size;
 }
 
@@ -55,7 +50,9 @@ bool SerialReader::Stop() {
 }
 
 
-void SerialReader::ReadPort(const std::function<void()> &onSerialDataAvailable) {
+template <typename Callback>
+requires std::is_same_v<void, std::invoke_result_t<Callback>>
+void SerialReader::ReadPort(Callback onSerialDataAvailable){
     if (pipe(pipefd.data()) == -1) {
         std::string error_message = "Failed to create pipe. ";
         throw SerialReaderException(error_message);
@@ -86,13 +83,6 @@ void SerialReader::ReadPort(const std::function<void()> &onSerialDataAvailable) 
     }
     std::cout << "1/6 Thread function finished: SerialReader::ReadPort()"
               << std::endl;
-}
-
-
-int SerialReader::GetBytesAvailable() const {
-    int bytesAvailable;
-    ioctl(serial_file_handle, FIONREAD, &bytesAvailable);
-    return bytesAvailable;
 }
 
 

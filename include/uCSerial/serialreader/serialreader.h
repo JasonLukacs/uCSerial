@@ -17,8 +17,6 @@ class SerialReader {
     );
     int Read(std::vector<char> &buffer) const;
     bool Stop();
-    int GetBufferSize() const;
-    int GetBytesAvailable() const;
 
   private:
     int serial_buffer_size = 0;
@@ -33,7 +31,9 @@ class SerialReader {
     bool StartReadingPort(const std::function<void()> &onSerialDataAvailable);
     bool CloseSerialPort() const;
 
-    void ReadPort(const std::function<void()> &onSerialDataAvailable);
+    template <typename Callback>
+    requires std::is_same_v<void, std::invoke_result_t<Callback>>
+    void SerialReader::ReadPort(Callback onSerialDataAvailable);
 };
 
 #endif
