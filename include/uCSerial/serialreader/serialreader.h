@@ -33,7 +33,7 @@ class SerialReader {
 
     template <typename Callback>
     requires std::is_same_v<void, std::invoke_result_t<Callback>>
-    void SerialReader::ReadPort(Callback onSerialDataAvailable);
+    void ReadPort(Callback onSerialDataAvailable);
 };
 
 #endif

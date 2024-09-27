@@ -19,7 +19,7 @@ bool ParserEngine::Run(const std::function<void(std::string)> &callback) {
         buffer_size = serialReader->Run(
             path,
             [this]() { onSerialDataAvailable(); },
-            [this](std::string error_message) { onSerialError(error_message); }
+            [this](const std::string& error_message) { onSerialError(error_message); }
         );
     } catch (const SerialReaderException &e) {
         throw MsgParserException(e.what());

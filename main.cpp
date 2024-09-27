@@ -18,15 +18,11 @@ int main(int argc, char *argv[]) {
 
   // Run the message parser.
   MessageParser messageParser(path);
-  try {
-    messageParser.Run();
-  } catch (const MsgParserException &e) {
-    std::cerr << e.what() << std::endl;
-    return 1;
-  }
+  messageParser.Run();
 
   // Goodbye.
   std::cout << "6/6 Leaving main()." << std::endl;
   std::cout << "Goodbye." << std::endl;
+  
   return 0;
 }

@@ -11,10 +11,7 @@ bool MessageParser::Run() {
     // Run parser engine untill any key is pressed.
     parserEngine.Run([this](const std::string &error_message) { ForceExit(error_message); });
 
-    if (pipe(pipefd.data()) == -1) {
-        std::string error_message = "Failed to create pipe. ";
-        throw MsgParserException(error_message);
-    }
+    pipe(pipefd.data());
     SerialUtils::WaitForKeypress(pipefd);
 
     // Stop parser.
