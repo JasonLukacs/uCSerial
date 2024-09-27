@@ -11,8 +11,8 @@ bool MessageParser::Run() {
     // Run parser engine untill any key is pressed.
     parserEngine.Run([this](const std::string &error_message) { ForceExit(error_message); });
 
-    pipe(pipefd.data());
-    SerialUtils::WaitForKeypress(pipefd);
+    pipe(exit_pipe.data());
+    SerialUtils::WaitForKeypress(exit_pipe);
 
     // Stop parser.
     parserEngine.Stop();
@@ -22,14 +22,14 @@ bool MessageParser::Run() {
 }
 
 
-// Callback for parser engine in case of trouble.
+// Callback for parser engine.
 bool MessageParser::ForceExit(const std::string &error_message) const {
     // Show error message.
     std::cout << "Message parser exit: ";
     std::cout << error_message << std::endl;
     
     // Exit WaitForKeypress
-    write(pipefd[1], "x", 1);
+    write(exit_pipe[1], "x", 1);
 
     return true;
 }

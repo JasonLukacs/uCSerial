@@ -51,20 +51,17 @@ bool SerialReader::Stop() {
 
 
 template <typename Callback>
-requires std::is_same_v<void, std::invoke_result_t<Callback>>
-void SerialReader::ReadPort(Callback onSerialDataAvailable){
-    if (pipe(pipefd.data()) == -1) {
-        std::string error_message = "Failed to create pipe. ";
-        throw SerialReaderException(error_message);
-    }
+    requires std::is_same_v<void, std::invoke_result_t<Callback>>
+void SerialReader::ReadPort(Callback onSerialDataAvailable) {
+
+    pipe(pipefd.data());
+    std::array<pollfd, 2> fds;
+    fds[0].fd = serial_file_handle;
+    fds[0].events = POLLIN;
+    fds[1].fd = pipefd[0];
+    fds[1].events = POLLIN;
 
     while (true) {
-        std::array<pollfd, 2> fds;
-        fds[0].fd = serial_file_handle;
-        fds[0].events = POLLIN;
-        fds[1].fd = pipefd[0];
-        fds[1].events = POLLIN;
-
         int ret = poll(fds.data(), 2, serial_timeout);
         if (ret > 0) {
             if (fds[0].revents & POLLIN) {
@@ -87,6 +84,7 @@ void SerialReader::ReadPort(Callback onSerialDataAvailable){
 
 
 int SerialReader::Read(std::vector<char> &buffer) const {
+
     ssize_t bytes_read = read(serial_file_handle, buffer.data(), serial_buffer_size);
 
     if (bytes_read == -1) {
