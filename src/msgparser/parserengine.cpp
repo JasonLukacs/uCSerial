@@ -7,16 +7,16 @@
 #include <regex>
 
 // Main loop
-bool ParserEngine::Run(const std::function<void(std::string)> &callback) {
+bool ParserEngine::run(const std::function<void(std::string)> &callback) {
 
-  callback_on_error = callback;
+  callbackOnError = callback;
 
-  LoadRules();
+  loadRules();
   this->serialReader =
       std::make_unique<SerialReader>(); // Spawn a serial reader.
 
   try {
-    buffer_size = serialReader->Run(
+    bufferSize = serialReader->Run(
         path, [this]() { onSerialDataAvailable(); },
         [this](const std::string &error_message) {
           onSerialError(error_message);
@@ -33,7 +33,7 @@ bool ParserEngine::Run(const std::function<void(std::string)> &callback) {
 
 void ParserEngine::onSerialDataAvailable() {
   // Get data
-  std::vector<char> buffer(buffer_size);
+  std::vector<char> buffer(bufferSize);
   int bytesRead = serialReader->Read(buffer);
 
   using enum State;
@@ -41,45 +41,45 @@ void ParserEngine::onSerialDataAvailable() {
        std::vector<char>(buffer.begin(), buffer.begin() + bytesRead)) {
     switch (currentState) {
     case READING_MSG_START:
-      ReadMsgStart(currentByte);
+      readMsgStart(currentByte);
       break;
     case READING_VALUE_START:
-      ReadValueStart(currentByte);
+      readValueStart(currentByte);
       break;
     case READING_VALUE_TYPE:
-      ReadValueType(currentByte);
+      readValueType(currentByte);
       break;
     case READING_VALUE:
-      ReadValue(currentByte);
+      readValue(currentByte);
       break;
     }
   }
 }
 
-bool ParserEngine::Stop() const {
+bool ParserEngine::stop() const {
   // Stop reading serial port.
   serialReader->Stop();
   std::cout << "4/6 Parser engine finished." << std::endl;
   return true;
 }
 
-bool ParserEngine::onSerialError(const std::string &error_message) const {
-  callback_on_error(error_message);
+bool ParserEngine::onSerialError(const std::string &errorMessage) const {
+  callbackOnError(errorMessage);
   return true;
 }
 
-bool ParserEngine::ReadMsgStart(char char_in) {
-  if (char_in == msg_rules.startMsg) {
+bool ParserEngine::readMsgStart(char char_in) {
+  if (char_in == msgRules.startMsg) {
     currentState = State::READING_VALUE_START;
   }
 
   return true;
 }
 
-bool ParserEngine::ReadValueStart(char charIn) {
-  if (charIn == msg_rules.startValue) {
+bool ParserEngine::readValueStart(char charIn) {
+  if (charIn == msgRules.startValue) {
     currentState = State::READING_VALUE_TYPE;
-  } else if (charIn == msg_rules.stopMsg) {
+  } else if (charIn == msgRules.stopMsg) {
     std::cout << std::endl;
     currentState = State::READING_MSG_START;
   }
@@ -87,13 +87,13 @@ bool ParserEngine::ReadValueStart(char charIn) {
   return true;
 }
 
-bool ParserEngine::ReadValueType(char charIn) {
+bool ParserEngine::readValueType(char charIn) {
   if (valueTypeBuffer.length() < 3) {
     valueTypeBuffer += charIn;
   }
 
   if (valueTypeBuffer.length() == 3) {
-    if (msg_rules.valueRules.contains(valueTypeBuffer)) {
+    if (msgRules.valueRules.contains(valueTypeBuffer)) {
       valueType = valueTypeBuffer;
       currentState = State::READING_VALUE;
     } else {
@@ -105,14 +105,14 @@ bool ParserEngine::ReadValueType(char charIn) {
   return true;
 }
 
-bool ParserEngine::ReadValue(char charIn) {
-  if (charIn == msg_rules.stopValue && ValidateValue()) {
+bool ParserEngine::readValue(char charIn) {
+  if (charIn == msgRules.stopValue && validateValue()) {
     // Received valid value.
     std::cout << valueType << ": " << valueBuffer << "\t ";
     valueBuffer = "";
     currentState = State::READING_VALUE_START;
   } else if (valueBuffer.length() <
-                 msg_rules.valueRules.at(valueType).maxDigits &&
+                 msgRules.valueRules.at(valueType).maxDigits &&
              std::isdigit(charIn)) {
     // Received valid character for value buffer.
     valueBuffer += charIn;
@@ -125,14 +125,14 @@ bool ParserEngine::ReadValue(char charIn) {
   return true;
 }
 
-bool ParserEngine::ValidateValue() const {
+bool ParserEngine::validateValue() const {
   int32_t receivedValue = 0;
 
   // Test if current string buffer contains an int.
   if (std::regex_match(valueBuffer, std::regex("^[-]?[0-9]+$"))) {
     // If an integer, test against the appropriate rules for this message type.
-    if (receivedValue >= msg_rules.valueRules.at(valueType).minValue &&
-        receivedValue <= msg_rules.valueRules.at(valueType).maxValue) {
+    if (receivedValue >= msgRules.valueRules.at(valueType).minValue &&
+        receivedValue <= msgRules.valueRules.at(valueType).maxValue) {
       return true;
     } else {
       // not
@@ -144,7 +144,7 @@ bool ParserEngine::ValidateValue() const {
   return true;
 }
 
-bool ParserEngine::LoadRules() {
+bool ParserEngine::loadRules() {
   std::string rules_JSON_schema =
       "../include/uCSerial/msgparser/rules_schema.json";
   std::string rules_file = "../config/msg_rules.json";
@@ -163,10 +163,10 @@ bool ParserEngine::LoadRules() {
   rapidjson::Document document = JSONparser.GetJSONDocument(rules_file);
 
   // Populate return object
-  msg_rules.startMsg = document["startMsg"].GetString()[0];
-  msg_rules.stopMsg = document["stopMsg"].GetString()[0];
-  msg_rules.startValue = document["startValue"].GetString()[0];
-  msg_rules.stopValue = document["stopValue"].GetString()[0];
+  msgRules.startMsg = document["startMsg"].GetString()[0];
+  msgRules.stopMsg = document["stopMsg"].GetString()[0];
+  msgRules.startValue = document["startValue"].GetString()[0];
+  msgRules.stopValue = document["stopValue"].GetString()[0];
 
   if (document.HasMember("valueRules") && document["valueRules"].IsObject()) {
     const rapidjson::Value &valueRules = document["valueRules"];
@@ -176,8 +176,8 @@ bool ParserEngine::LoadRules() {
       int minValue = innerObject["minValue"].GetInt();
       int maxValue = innerObject["maxValue"].GetInt();
       uint8_t digit_count =
-          std::max(CountDigits(minValue), CountDigits(maxValue));
-      msg_rules.valueRules.try_emplace(key.GetString(), msgDescriptor, minValue,
+          std::max(countDigits(minValue), countDigits(maxValue));
+      msgRules.valueRules.try_emplace(key.GetString(), msgDescriptor, minValue,
                                        static_cast<uint32_t>(maxValue),
                                        digit_count);
     }
@@ -188,7 +188,7 @@ bool ParserEngine::LoadRules() {
   return true;
 }
 
-template <typename T> uint8_t ParserEngine::CountDigits(T x) const {
+template <typename T> uint8_t ParserEngine::countDigits(T x) const {
   uint8_t digits = x == 0 ? 1 : static_cast<uint8_t>(log10(abs(x))) + 1;
   digits += (x < 0 ? 1 : 0);
   return digits;

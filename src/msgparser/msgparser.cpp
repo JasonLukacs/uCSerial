@@ -9,7 +9,7 @@
 bool MessageParser::run() {
 
   // Run parser engine. Call forceExit upon error.
-  parserEngine.Run(
+  parserEngine.run(
       [this](const std::string &errorMessage) { forceExit(errorMessage); });
 
   // Wait untill any key is pressed or forceExit writes to pipe.
@@ -17,7 +17,7 @@ bool MessageParser::run() {
   SerialUtils::waitForKeypress(exitPipe);
 
   // Stop parser.
-  parserEngine.Stop();
+  parserEngine.stop();
   std::cout << "5/6 Message parser finished." << std::endl;
 
   return true;

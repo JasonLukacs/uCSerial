@@ -8,14 +8,14 @@ class ParserEngine {
   public:
     explicit ParserEngine(const std::string &path) : path(path) {}
    
-    bool Run(const std::function<void(std::string)> &callback);
-    bool Stop() const;
+    bool run(const std::function<void(std::string)> &callback);
+    bool stop() const;
 
   private:
     // Program (-flow)
     const std::string path;
-    std::function<void(std::string)> callback_on_error;
-    int buffer_size = 0;
+    std::function<void(std::string)> callbackOnError;
+    int bufferSize = 0;
 
     enum class State {
         READING_MSG_START,
@@ -25,26 +25,26 @@ class ParserEngine {
     };
     State currentState = State::READING_MSG_START;
 
-    Rules msg_rules;
+    Rules msgRules;
     std::unique_ptr<SerialReader> serialReader;
 
-    bool LoadRules();
+    bool loadRules();
     template <typename T>
-    uint8_t CountDigits(T x) const;
+    uint8_t countDigits(T x) const;
 
     void onSerialDataAvailable();
-    bool onSerialError(const std::string &error_message) const;
+    bool onSerialError(const std::string &errorMessage) const;
   
     // State handling
     std::string valueType;
     std::string valueTypeBuffer;
     std::string valueBuffer;
 
-    bool ReadMsgStart(char char_in);
-    bool ReadValueStart(char charIn);
-    bool ReadValueType(char charIn);
-    bool ReadValue(char charIn);
-    bool ValidateValue() const;
+    bool readMsgStart(char charIn);
+    bool readValueStart(char charIn);
+    bool readValueType(char charIn);
+    bool readValue(char charIn);
+    bool validateValue() const;
 };
 
 #endif
