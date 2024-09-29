@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
   // Run the message parser.
   MessageParser messageParser(path);
-  messageParser.Run();
+  messageParser.run();
 
   // Goodbye.
   std::cout << "6/6 Leaving main()." << std::endl;
