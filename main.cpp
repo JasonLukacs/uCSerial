@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   std::filesystem::path executable(argv[0]);
   std::string path = executable.parent_path().string();
 
-  // Run the message parser.
+  // Run a message parser.
   MessageParser messageParser(path);
   messageParser.run();
 
