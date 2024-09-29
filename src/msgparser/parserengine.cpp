@@ -35,7 +35,7 @@ void ParserEngine::onSerialDataAvailable() {
     // Get data
     std::vector<char> buffer(buffer_size);
     int bytesRead = serialReader->Read(buffer);
-
+    
     using enum State;
     for (char currentByte : std::vector<char>(buffer.begin(), buffer.begin() + bytesRead)) {
         switch (currentState) {
