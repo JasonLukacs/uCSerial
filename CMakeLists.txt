@@ -13,7 +13,7 @@ include_directories(
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS)
 
 if(APPLE)
   add_executable(serialreader    

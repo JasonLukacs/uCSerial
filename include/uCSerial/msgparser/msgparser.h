@@ -7,6 +7,7 @@ class MessageParser {
 public:
   explicit MessageParser(const std::string &path)
       : path(path), parserEngine(path) {}
+
   bool run();
 
 private:
