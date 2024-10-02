@@ -1,5 +1,3 @@
-#include "uCSerial/serialreader/exceptions.h"
-#include "uCSerial/serialreader/serialconfig.h"
 #include "uCSerial/serialreader/serialreader.h"
 
 #include <jsonparser.h>
@@ -103,7 +101,10 @@ bool SerialReader::OpenSerialPort(const std::string &path) {
   serial_file_handle =
       open(serialConfig.serial_port.c_str(), O_RDWR | O_NOCTTY);
   if (serial_file_handle == -1) {
+    
+    //zoek deze case leidt niet tot program exit!!!
     std::string error_message = "Fatal error: Failed to open serial port ";
+    
     error_message += serialConfig.serial_port.c_str();
     error_message += ".";
     throw SerialReaderException(error_message);

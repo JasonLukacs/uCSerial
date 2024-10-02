@@ -8,9 +8,8 @@
 // Main loop
 bool MessageParser::run() {
 
-  // Run parser engine. Call forceExit upon error.
-  parserEngine.run(
-      [this](const std::string &errorMessage) { forceExit(errorMessage); });
+  // Run parser engine. Calls forceExit upon error.
+  parserEngine.run();
 
   // Wait untill any key is pressed or forceExit writes to pipe.
   pipe(exitPipe.data());

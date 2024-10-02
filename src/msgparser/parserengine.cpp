@@ -7,13 +7,9 @@
 #include <regex>
 
 // Main loop
-bool ParserEngine::run(const std::function<void(std::string)> &callback) {
-
-  callbackOnError = callback;
-
+bool ParserEngine::run() {
   loadRules();
-  this->serialReader =
-      std::make_unique<SerialReader>(); // Spawn a serial reader.
+  this->serialReader = std::make_unique<SerialReader>();
 
   try {
     bufferSize = serialReader->Run(
@@ -22,7 +18,6 @@ bool ParserEngine::run(const std::function<void(std::string)> &callback) {
           onSerialError(error_message);
         });
   } catch (const SerialReaderException &e) {
-    // throw MsgParserException(e.what());
     onSerialError(e.what());
   }
 
@@ -154,7 +149,6 @@ bool ParserEngine::loadRules() {
     JSONParser JSONparser;
     JSONparser.JSONValidate(rules_JSON_schema, rules_file);
   } catch (const JSONParserException &e) {
-    // throw MsgParserException(e.what());
     onSerialError(e.what());
   }
 
@@ -178,8 +172,8 @@ bool ParserEngine::loadRules() {
       uint8_t digit_count =
           std::max(countDigits(minValue), countDigits(maxValue));
       msgRules.valueRules.try_emplace(key.GetString(), msgDescriptor, minValue,
-                                       static_cast<uint32_t>(maxValue),
-                                       digit_count);
+                                      static_cast<uint32_t>(maxValue),
+                                      digit_count);
     }
   } else {
     // Handle error: "valueRules" not found or is not an object

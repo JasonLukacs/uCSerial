@@ -1,8 +1,8 @@
 #ifndef SERIALREADER_H
 #define SERIALREADER_H
 
-#include "serialconfig.h"
 #include "exceptions.h"
+#include "serialconfig.h"
 
 #include <array>
 #include <thread>

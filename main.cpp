@@ -12,6 +12,7 @@ function            camelCase
 #include "uCSerial/msgparser/msgparser.h"
 
 int main(int argc, char *argv[]) {
+
   // Get path to find config files.
   std::filesystem::path executable(argv[0]);
   std::string path = executable.parent_path().string();
@@ -23,7 +24,6 @@ int main(int argc, char *argv[]) {
   // Goodbye.
   std::cout << "6/6 Leaving main()." << std::endl;
   std::cout << "Goodbye." << std::endl;
-  
+
   return 0;
-  
 }

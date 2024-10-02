@@ -6,7 +6,9 @@
 class MessageParser {
 public:
   explicit MessageParser(const std::string &path)
-      : path(path), parserEngine(path) {}
+      : path(path), parserEngine(path, [this](const std::string &errorMessage) {
+          return forceExit(errorMessage);
+        }) {}
 
   bool run();
 
